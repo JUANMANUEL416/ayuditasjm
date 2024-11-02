@@ -1,0 +1,26 @@
+97509  lactato
+
+1602
+mov_sinfactura
+
+
+'IART','PRECOMERCIAL','Clacificacion de Riesgo'
+
+TABLA =IART
+CAMPO = PRECOMERCIAL
+
+
+JUAN316
+
+
+
+
+SistemasCMSL2016&
+
+--  correo
+clinicahigeatalentohumano@hotmail.com
+yasmin pascuales romero - dir talento humano
+3113418410-- whassapt
+Angelica Diaz -- Asisten Talento Humano
+
+h83g5c

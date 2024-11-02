@@ -1,0 +1,53 @@
+'e._currentRowDataNew.NOAUT=rs.Data(1)
+
+http://translate.google.com.co/translate?hl=es&langpair=en|es&u=http://blog.alphasoftware.com/2010/12/how-to-call-sql-stored-procedure-with.html
+
+msgbox("incio","que carajos hago")
+function fnk_genconsecutivo as c (e as p)()
+	dim cn as sql::Connection
+	dim rs as sql::ResultSet
+	dim args as sql::Arguments
+	dim ok as l
+	dim sede as ""
+	
+	sede=e._currentRowDataNew.NOAUT
+	
+	args.ADD("COMPANIA","01")
+	args.Add("SEDE","23001")
+	args.Add("PREFIJO","@AUT")
+	args.Add("NVOCONSEC","")
+	
+	ok=cn.Open("::Name::NUEVA")
+	if ok then 
+		cn.Execute("EXEC SPK_GENCONSECUTIVO :COMPANIA,:SEDE,:PREFIJO,:NVOCONSEC",args)
+		if ok then
+			rs=cn.ResultSet
+			ok=cn.Close()
+		end if
+	end if
+    
+end function
+msgbox("hice algo carajo")
+
+
+
+function mipaso() {
+ alert("inicio funcion");
+ var rowNum = {grid.object}._selectedRow;
+ {grid.Object}.ajaxCallback('G',rowNum,'fnk_genconsecutivo','','_getData=true');
+ alert("despues de volver")
+}
+
+
+INSERT INTO AUT (IDAUT, FECHA, IDAFILIADO, IDSEDE, ALTOCOSTO, CLASEORDEN, IDIPSSOLICITA, IDGRUPOSER, IDPROVEEDOR, DXPPAL, USUARIO, MEDAUDITOR)  
+VALUES  (:New_IDAUT, :New_FECHA, :New_IDAFILIADO, :New_IDSEDE, :New_ALTOCOSTO, :New_CLASEORDEN, :New_IDIPSSOLICITA, :New_IDGRUPOSER, :New_IDPROVEEDOR,
+ :New_DXPPAL, :New_USUARIO, :New_MEDAUDITOR)
+ 
+ args.ADD("COMPANIA","01")
+	args.Add("SEDE","23001")
+	args.Add("PREFIJO","@AUT")
+	args.Add("NVOCONSEC","")
+
+	sql="EXEC SPK_INSERTA_AUT " + :New_FECHA+ ","+ :New_IDAFILIADO+ ","+ :New_IDCONTRATO+ ","+ :New_IDSEDE+ ","+ :New_IDSOLICITANTE+ ","+ :New_ALTOCOSTO+ ","+ :New_CLASEORDEN+ ","+ :New_IDIPSSOLICITA+ ","+ :New_IDGRUPOSER+ ","+ :New_IDPROVEEDOR+ ","+ :New_DXPPAL+ ","+ :New_USUARIO+ ","+ :New_MEDAUDITOR
+	
+			cn.Execute("EXEC SPK_GENCONSECUTIVO1 :COMPANIA,:SEDE,:PREFIJO,:NVOCONSEC",args)

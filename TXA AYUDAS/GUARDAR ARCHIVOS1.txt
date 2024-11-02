@@ -1,0 +1,39 @@
+ IF LOC:RUTA <>'' AND DOCXTPO:TIPODOC <>''THEN
+!TRAER SOLO EL NOMBRE DEL DOCUMENTO
+    LOC:SQL = 'SELECT dbo.FNK_SELECT_NOMB_ARCHI('&FNSQLFMT(LOC:RUTA)& ')'
+    CLEAR(WDUM:RECORD)
+    WDUM{PROP:SQL} = LOC:SQL
+    ACCESS:WDUM.NEXT()
+    DOCXTPO:RUTA =  CLIP(DOCXTPO:TIPO)&'_'&CLIP(DOCXTPO:NODOCUMENTO)&'_'&CLIP(DOCXTPO:IDAFILIADO)&'_'& WDUM:C1
+
+
+
+    COPY(CLIP(LOC:RUTA),CLIP(FNVALORVARIABLE('DOCXTPO_PAT'))&DOCXTPO:IDAFILIADO&'\'&CLIP(DOCXTPO:RUTA))
+
+    IF ERRORCODE()  THEN      !If not enough memory
+
+       IF FNVALORVARIABLE('DOCXTPO_PAT')<> '' THEN
+          MiDir = CLIP(FNVALORVARIABLE('DOCXTPO_PAT'))&DOCXTPO:IDAFILIADO
+          Ret = MkDir(MiDir)
+          COPY(CLIP(LOC:RUTA),CLIP(FNVALORVARIABLE('DOCXTPO_PAT'))&DOCXTPO:IDAFILIADO&'\'&CLIP(DOCXTPO:RUTA))
+          
+          IF ERRORCODE()  THEN      !If not enough memory
+             stop('Error al guardar el documento Comuníquese con el administrador del sistema') !display message
+             CYCLE
+          else
+             message('se creo correctamente el directorio')
+          END
+       ELSE
+          stop('Error al guardar el documento Comuníquese con el administrador del sistema') !display message
+          CYCLE
+       END
+     ELSE
+        message('Docucumento Adicionado al Historial del Afiliado')
+     END
+
+           
+ELSE
+    MESSAGE('SELECIONE LA RUTA Y TIPO DE DOCUMENTO')
+    CYCLE
+
+END

@@ -1,0 +1,25 @@
+          loc:formccosto = ''
+          IF FNVALORVARIABLE('CCOSTOCONAREA') = 'SI'
+             LOC:SQL = 'SELECT CCOSTO, DESCRIPCION FROM CEN WHERE IDAREA = '&FNSQLFMT(GLO:IDAREA)
+          ELSE
+             LOC:SQL = 'SELECT CCOSTO, DESCRIPCION FROM CEN '
+          END
+          IF FNVALORVARIABLE('IDDEPURAR') = 'SI' AND GLO:GRUPO = 'PPAL'
+             SETCLIPBOARD(LOC:SQL)
+             STOP('SQL')
+          END
+          CLEAR(WDUM:RECORD)
+          WDUM{PROP:SQL} = LOC:SQL
+          LOOP UNTIL ACCESS:WDUM.NEXT()
+             loc:formccosto = CLIP(loc:formccosto)&CLIP(wdu:c1)&'-'&CLIP(WDU:C2)&'|#'&CLIP(WDU:C1)&'|'
+          END
+          A# = LEN(CLIP(loc:formccosto))
+          loc:formccosto = SUB(loc:formccosto,1,a#-1)
+          ?GLO:CCOSTO{PROP:FROM} = loc:formccosto
+
+
+DISPLAY
+
+SANDER
+
+REVISAR  :::: FNK_CALCULO_VALORCONCEPTO_NOM

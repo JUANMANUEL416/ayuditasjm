@@ -1,0 +1,2 @@
+Win:DetaleMovArt
+Win:DetalleCompraArt

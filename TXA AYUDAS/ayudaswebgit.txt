@@ -1,0 +1,4 @@
+git init  -- crear el reporsitorio logal
+git add archivo .
+git commit -- se crea el registro historico
+git status -- se muestra el estado de los archivos cambiados  sin subir - puedo elegir cual quiero enviar

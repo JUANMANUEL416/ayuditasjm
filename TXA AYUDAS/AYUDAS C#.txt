@@ -1,0 +1,12 @@
+
+COMO LLENAR UN ViewBag
+
+1. LLENO DATOS
+   rcomita.CNSCOMITE = comite;
+   List<RCOMITA> lrcomita = DB.SGP_RCOMITA(Session["CIA"].ToString(), "READ", rcomita);
+   ViewBag.ASISTENTE = lrcomita;   
+   
+2. RECORRER EL ViewBag
+  @foreach (var dept in ViewBag.ASISTENTE)
+    {
+    }

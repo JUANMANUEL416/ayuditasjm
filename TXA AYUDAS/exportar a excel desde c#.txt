@@ -1,0 +1,136 @@
+     public ActionResult ExportExcel(string usuariof, string estadof, string asignadoaf, int proyectof =0)
+        {
+            var rta = new JsonResult();
+
+            string filename = CrearExcel(usuariof, estadof, asignadoaf, proyectof);
+
+            rta.Data = new { filename = filename };
+            return rta;
+        }
+        public static DataTable ConvertToDataTable<T>(this IList<T> data)
+        {
+            PropertyDescriptorCollection properties =
+                TypeDescriptor.GetProperties(typeof(T));
+            DataTable table = new DataTable();
+            foreach (PropertyDescriptor prop in properties)
+                table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
+            foreach (T item in data)
+            {
+                DataRow row = table.NewRow();
+                foreach (PropertyDescriptor prop in properties)
+                    row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;
+                table.Rows.Add(row);
+            }
+            table.AcceptChanges();
+            return table;
+        }
+        public string CrearExcel(string usuariof, string estadof, string asignadoaf, int proyectof = 0)
+        {
+            Random randomClass = new Random();
+            int randomNumber = randomClass.Next(0, 5000);
+            string path = Server.MapPath("~/Temp/");
+            string filename = "Reporte_Estado requerimientos_"+ randomNumber.ToString() + ".xlsx";
+            string file = path + filename;
+
+            SLDocument sl = new SLDocument();
+            sl.RenameWorksheet("Sheet1", "REPORTE");
+            sl.SetColumnWidth("A", 1.0);
+
+            int xlFil = 1;
+            int xlCol = 2;
+
+            SLStyle style = new SLStyle();
+            style.Font.FontName = "Arial";
+            style.Font.Bold = true;
+            style.Font.FontSize = 10;
+
+            sl.SetCellValue(xlFil, xlCol, "DETALLE REQUERIMIENTOS " );
+
+            //if (idreporte == 1)
+            //{
+            //    sl.MergeWorksheetCells("B1", "D1");
+            //}
+
+            //if (idreporte == 2)
+            //{
+            //    sl.MergeWorksheetCells("B1", "C1");
+            //}
+
+            //if (idreporte == 13)
+            //{
+            //    sl.MergeWorksheetCells("B1", "D1");
+            //}
+
+            //sl.SetCellStyle(xlFil, xlCol, style);
+            xlFil++;
+
+            //sl.SetCellValue(xlFil, xlCol, "Desde: ");
+            //sl.SetCellValue(xlFil, xlCol + 1, fecIni);
+            //sl.SetCellStyle(xlFil, xlCol, style);
+            //xlFil++;
+
+            //sl.SetCellValue(xlFil, xlCol, "Hasta: ");
+            //sl.SetCellValue(xlFil, xlCol + 1, fecFin);
+            //sl.SetCellStyle(xlFil, xlCol, style);
+            //xlFil++;
+
+            Context db = new Context();
+            //fecIni = fecIni + " 00:00:00";
+            //fecFin = fecFin + " 23:59:59";
+
+            //Reportes REP = new Reportes();
+            //REP.ITIPOTRAN = idreporte;
+            //REP.FECDESDE = fecIni;
+            //REP.FECHASTA = fecFin;
+            REQU requ = new REQU();
+            requ.USUARIOF = usuariof;
+            requ.ESTADO = estadof;
+            requ.IDRESP = asignadoaf;
+            requ.IDPRO = Convert.ToInt32(proyectof);
+            List<REQU> lista = db.SGP_REQU(Session["CIA"].ToString(), "READ", requ);
+            DataTable dt = ConvertToDataTable(lista);
+            xlFil = 6;
+
+            CrearTitulos(sl, xlFil, xlCol, dt);
+            xlFil++;
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                xlCol = 2;
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    sl.SetCellValue(xlFil, xlCol, dt.Rows[i][j].ToString());
+                    xlCol++;
+                }
+                xlFil++;
+            }
+
+            xlCol = 2;
+            for (int j = 0; j < dt.Columns.Count; j++)
+            {
+                sl.AutoFitColumn(xlCol + j);
+            }
+
+            sl.SaveAs(file);
+            return filename;
+
+        }
+
+        public void CrearTitulos(SLDocument sl, int fila, int col, DataTable dt)
+        {
+            SLStyle style = sl.CreateStyle();
+            style.Border.TopBorder.BorderStyle = DocumentFormat.OpenXml.Spreadsheet.BorderStyleValues.Thin;
+            style.Border.LeftBorder.BorderStyle = DocumentFormat.OpenXml.Spreadsheet.BorderStyleValues.Thin;
+            style.Border.BottomBorder.BorderStyle = DocumentFormat.OpenXml.Spreadsheet.BorderStyleValues.Thin;
+            style.Border.RightBorder.BorderStyle = DocumentFormat.OpenXml.Spreadsheet.BorderStyleValues.Thin;
+            style.Font.Bold = true;
+            style.Font.FontColor = System.Drawing.Color.White;
+            style.Fill.SetPattern(DocumentFormat.OpenXml.Spreadsheet.PatternValues.Solid, System.Drawing.Color.FromArgb(0, 102, 178), System.Drawing.Color.DarkSalmon);
+
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                sl.SetCellValue(fila, col, dt.Columns[i].ColumnName);
+                sl.SetCellStyle(fila, col, style);
+                col++;
+            }
+        }

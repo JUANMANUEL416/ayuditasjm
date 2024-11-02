@@ -1,0 +1,71 @@
+
+lineas de trabajo:
+
+FUSU:FUSUIDFUNCIONARIO
+FUSU:IDFUNCIONARIO
+FUSU:Elegir  --4224994 ESPERANZA
+
+
+IF THISWINDOW.REQUEST = INSERTRECORD
+   FCXC:CNSCXC = clip(GLO:IDSEDE)&format(fnGeneraConsecutivo(GLO:IDSEDE,'@CXC'),@n08)
+END
+
+GLO:CXC=FCXCDV:CNSCXC
+GLO:TIPO=FCXCDV:TIPO
+GLO:ITEM=FCXCDV:ITEM
+GLO:CNSGLO=FCXCDV:CNSGLO
+
+
+ CLEAR(WDUM:RECORD)
+ LOC:SQL='SELECT MAX(COALESCE(ITEM_FCONCID,0))+1 FROM FCONCID WHERE IDFCONCI='&FNSQLFMT(FCONCID:IDFCONCI)
+ WDUM{PROP:SQL} = LOC:SQL
+ ACCESS:WDUM.NEXT()
+ FCONCID:ITEM_FCONCID=WDU:C1
+ 
+ IF CERRADA
+ anular ?Button12
+ confirmar ?Button8
+ nuevoarriba ?Insert
+ nuebo abajo ?Insert2
+ editar arriba ?Change
+ editar abajo ?Change2
+ borrar abajo ?Delete
+ 
+ DISABLE(?Insert:2)
+    DISABLE(?Change:2)
+   DISABLE(?Delete)
+   
+    hide(?BorrarF)
+	unhide(?BorrarF
+ 
+ 
+ 
+ 'Ingresada|#Ingresada|Cerrada|#Cerrada|Anulada|#Anulada'
+ 
+ 
+ !INICIO
+CLEAR(WDUM:RECORD)
+LOC:SQL=' SELECT CNSCXC,N_FACTURA,TIPO,CNSGLO,SALDONETO,VLRACEPTADO,VLRRECUPERAR,OBSERVACION FROM FCONCID WHERE IDFONCI='&FNSQLFMT(FCONCI:IDFCONCI)
+WDUM{PROP:SQL}=LOC:SQL
+ACCESS:WDUM.NEXT()
+LOOP
+
+APLICAR FILTRO
+
+ BRW1::View:Browse{PROP:SQLFILTER}=loc:filtro
+
+
+  DISABLE(?Insert:2)
+   DISABLE(?Editar:2)
+   DISABLE(?Delete:2)
+   hide(?Insert:2)
+   hide(?Editar:2)
+   hide(?Delete:2)
+   
+   
+   ENABLE(?Insert:2)
+   ENABLE(?Editar:2)
+   ENABLE(?Delete:2)
+   unhide(?Insert:2)
+   unhide(?Editar:2)
+   unhide(?Delete:2)

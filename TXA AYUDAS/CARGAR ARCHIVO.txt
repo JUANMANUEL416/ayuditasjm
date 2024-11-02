@@ -1,0 +1,42 @@
+IF loc:cargarfirma
+
+                     Arc:nombre      = loc:firma
+                     GLO:DosFileName = Arc:nombre
+                     OPEN(DosFile)
+                     FileSize# = BYTES(DosFile)
+                     Arc:nombre{PROP:Size} = FileSize#
+                     LastRec# = FileSize# % SIZE(DOS:Record)
+                     SavPtr# = 1
+                     LOOP INT(FileSize#/SIZE(DOS:Record)) TIMES
+                        GET(DosFile,SavPtr#)
+                        ASSERT(NOT ERRORCODE())
+                        Arc:dicom[SavPtr# - 1 : SavPtr# + SIZE(DOS:Record) - 2] = DOS:Record
+                        SavPtr# += SIZE(DOS:Record)
+                     END
+                     IF LastRec#
+                        GET(DosFile,SavPtr#)
+                        ASSERT(BYTES(DosFile) = LastRec#)
+                        Arc:dicom[SavPtr# - 1 : SavPtr# + LastRec# - 2] = DOS:Record
+                     END
+
+                     ASSERT(NOT ERRORCODE())
+                     CLOSE(DosFile)
+                     if not access:archivos.insert()
+                     message('Archivo de Imagen Grabado.','krystalos',icon:question)
+                     else
+                     message('Error al grabar archivo de imagen:' & fileerror() & errorcode())
+                     end
+                     archivos{PROP:SQL}  = 'SELECT @@IDENTITY'
+                     NEXT(archivos)
+                     MED:IDFIRMA        = Arc:id
+
+END
+
+archivos{prop:owner} =  GLO:DSN
+
+Arc:id = MED:IDFIRMA
+access:archivos.fetch(Arc:PK_Archivos)
+?Image1{PROP:ImageBlob} =Arc:dicom{PROP:Handle}
+?Image1{PROP:Width}  = 200
+?Image1{PROP:Height} = 100
+display

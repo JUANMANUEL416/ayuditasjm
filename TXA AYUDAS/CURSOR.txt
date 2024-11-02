@@ -1,0 +1,58 @@
+	DECLARE PG_CURSOR CURSOR FOR      
+	OPEN PG_CURSOR    
+	FETCH NEXT FROM PG_CURSOR    
+	INTO @N_FACTURA
+	WHILE @@FETCH_STATUS = 0    
+	BEGIN 
+	FETCH NEXT FROM PG_CURSOR    
+	INTO @N_FACTURA, @ITEM, @TIPO, @CNSGLO
+	END
+	CLOSE PG_CURSOR
+	DEALLOCATE PG_CURSOR
+   https://pastebin.com/cfTMeH3Z?fbclid=IwAR0gx_JgtIYkHwL-10ZRzH2z70Z1bGKEIwt70Joxm-Bo_7On-Xdn4DtvQa4 -- MUCHOS CURSOS
+   https://detodoyparatodoswm.blogspot.com/2019/05/aprende-programacion-c-con-visual-studio.html?fbclid=IwAR0kMLNqQEVH-pyTBeksSIshRbbVe0MrvaVJ24B6y5sgbeKDA4Ldg1xaE3k
+   
+   http://www.locurainformaticadigital.com/curso-gratuito-java-basico-avanzado/
+   https://www.youtube.com/playlist?list=PLU8oAlHdN5BmpobVmj1IlneKlVLJ84TID
+   https://www.youtube.com/playlist?list=PLU8oAlHdN5BkinrODGXToK9oPAlnJxmW_
+   --MEGA https://mega.nz/#!PMpFyQ4A!2vERbmOZK-95Kk8hjA8V0Lqk6i7oABONbT3SykQTR9U
+    if thiswindow.request = insertrecord
+    CTCA:IDACTA = CLIP(CTCA:IDCOMITE)&'-'&format(fnGeneraConsecutivo(GLO:IDSEDE,CTCA:IDCOMITE),@n04)
+    LOC:SQL=' UPDATE CTCSOL SET ESTADO=''I'' WHERE CONSECUTIVO='&FNSQLFMT(CTCA:IDAUT)
+    WDUM{PROP:SQL}= LOC:SQL
+    STOP(CTCA:IDACTA)
+ end
+ 
+ Medic@Peru*456
+ ---HOJA TRATAMIENTO
+ --
+ 8526975
+ 8520979
+ ?ICxpN_Factura
+ LLL
+ 
+ 121.
+ 36
+ --
+ 
+ tel domicilio monteria
+ 4 7927575 -- pizerria
+ 3104119398--
+ --- 
+ centrocru01
+ 
+ 7812363 -- polloarana
+ 
+ calle 38 nr0 1-w -22 por el otro lado del rio 202
+ 
+ --cancekar
+ 
+ 
+ SE HACE ACOMPAÑAMIENTO AL ÁREA DE FACTURACIÓN RESOLVIENDO FACTURAS CON ERRORES EN VALORES, MOTIVOS POR LOS CUALES NO  SE PODÍAN IMPRIMIR, RESOLUCIÓN DE TIQUES.
+
+SE TRABAJA CON EL ING PEDRO QUIEN MOSTRÓ CUAL ERA EL FORMATO DE  REFERENCIA QUE SE LE QUIERE DAR AL USUARIO Y COMO ES QUE SE NECESITA.
+SE TRABAJA JUNTO CON DESARROLLO, DANDO SOPORTE REMOTO A SAN LUIS Y HUMANIZARTE
+ 
+ 
+ 
+ 

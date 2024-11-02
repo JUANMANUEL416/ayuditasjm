@@ -1,0 +1,33 @@
+slmgr /ipk VK7JG-NPHTM-C97JM-9MPGT-3V66T
+slmgr /skms kms.digiboy.ir
+
+slmgr /ato
+
+
+VK7JG-NPHTM-C97JM-9MPGT-3V66T
+VK7JG-NPHTM-C97JM-9MPGT-3V66T
+MH37W-N47XK-V7XM9-C7227-GCQG9
+VK7JG-NPHTM-C97JM-9MPGT-3V66T
+W269N-WFGWX-YVC9B-4J6C9-T83GX
+WNMTR-4C88C-JK8YV-HQ7T2-76DF9
+W269N-WFGWX-YVC9B-4J6C9-T83GX
+TX9XD-98N7V-6WMQ6-BX7FG-H8Q99
+DPH2V-TTNVB-4X9Q3-TJR4H-KHJW4
+
+VK7JG-NPHTM-C97JM-9MPGT-3V66T
+
+
+DISM /online /Set-Edition:ServerStandard /ProductKey:VK7JG-NPHTM-C97JM-9MPGT-3V66T /AcceptEula
+DISM /online /Set-Edition:Professional /ProductKey:VK7JG-NPHTM-C97JM-9MPGT-3V66T /AcceptEula
+
+slmgr /upk
+slmgr.vbs /cpky
+slmgr /ckms
+slmgr.vbs /ckms
+slmgr /skms localhost
+slmgr.vbs -ipk VK7JG-NPHTM-C97JM-9MPGT-3V66T
+slmgr.vbs -ato
+
+
+Dism /Online /Get-TargetEditions
+DISM /online /Cleanup-Image /ScanHealth

@@ -1,0 +1,85 @@
+Fotos numéricos y de moneda
+
+
+
+@ N [moneda] [signo] [fill] tamaño [grupo] [lugares] [signo] [moneda] [B]
+
+@ N Todas las imágenes numéricos y de moneda empezar con @ N.
+
+De cualquier divisa un signo de dólar ($) o una constante cadena entre tildes (~). Cuando le precede el indicador de señal y no hay indicador de llenado, el símbolo de la moneda "flota" a la izquierda del dígito de orden superior. Si hay un indicador de llenado, el símbolo de moneda se mantiene fijo en la posición más a la izquierda. Si el indicador de moneda sigue el tamaño y la agrupación, que aparece al final del número mostrado.
+
+signo Especifica el formato de visualización de números negativos. Si un guión (-) precede a los indicadores de relleno y tamaño, los números negativos se mostrará con un signo menos. Si un guión sigue el tamaño
+, Los lugares y los indicadores de divisas, los números negativos se mostrará con un signo menos al final. Si los paréntesis se colocan en ambas posiciones, los números negativos se mostrará entre paréntesis. Para evitar la ambigüedad, un signo menos arrastre siempre debe tener la agrupación especificada.
+
+Especifica llenar ceros a la izquierda, espacios, o asteriscos (*) en las principales posiciones cero, y la agrupación suppressesdefault. Si el relleno se omite, ceros a la izquierda se suprimen.
+0 (cero) Produce ceros a la izquierda
+_ (Guión bajo) Genera espacios iniciales
+* (Asterisco) Produce asteriscos principales
+Tamaño El tamaño es necesario para especificar el número total de dígitos significativos para mostrar, incluyendo el número de dígitos en el indicador de los lugares y todos los caracteres de formato.
+
+Al agrupar un símbolo de agrupamiento, que no sea una coma (por defecto), pueden aparecer a la derecha del indicador de talla para especificar un separador de tres dígitos grupo. Para evitar la ambigüedad, un indicador agrupación guión también debe especificar el signo.
+ . (Punto) Produce períodos
+- (Guión) Produce guiones
+_ (Guión bajo) Genera espacios
+lugares Especifica el símbolo del separador decimal y el número de dígitos decimales. El número de dígitos decimales debe ser menor que el tamaño. El separador decimal puede ser un punto, acento grave (') (produce períodos de agrupación menos que se sustituya), o la letra "v" (sólo se utiliza para las declaraciones CUERDA almacenamiento de campo - no para la pantalla) (.).
+
+ . (Punto) Produce un período
+`(Acento grave) Produce una coma
+v No produce separador decimal
+B Especifica pantalla en blanco siempre que su valor es cero.
+
+Los valores numéricos numéricos y formato de moneda imágenes para visualización en pantalla o en informes. Si el valor es mayor que el valor máximo de la imagen puede mostrar, una cadena de signos de almohadilla (#) en la pantalla.
+
+Ejemplo:
+
+Formato de resultado numérico
+
+@ N9 4.550.000 nueve dígitos, grupo con comas (por defecto)
+@ N_9B 4550000 nueve dígitos, ni agrupación, espacios en blanco delante si es cero
+@ N09 004550000 nueve dígitos, el cero
+@ N * 9 *** 45.000 nueve dígitos, el relleno de asterisco, grupo con comas
+@ N9_ 4 550 000 Nueve dígitos, grupo con espacios
+@ N9. 4.550.000 nueve dígitos, grupo con períodos
+
+
+
+Formato Resultado Decimal
+@ N9.2 4,550.75 dos decimales, separador decimal período
+
+@ N_9.2B 4550,75 dos decimales, el separador decimal, no hay período de agrupación, si es en blanco cero
+
+@ N_9 `2 4550,75 dos decimales, separador de coma decimal
+@ N9. `2 4.550,75 separador decimal Coma, grupo con períodos
+@ N9_ `2 4 550,75 decimal separador por comas, grupo con espacios
+
+Resultado Firmado Formato
+@ N-9.2B -2,347.25 signo menos delante, en blanco si es cero
+@ N9.2-2,347.25 - Trailing signo menos
+@ N (10,2) (2,347.25) encerrado en paréntesis cuando es negativo
+
+
+
+Dólar
+Formato de moneda Resultados
+@ N $ 9.2B $ 2,347.25 signo de dólar en blanco si es cero
+@ N $ 10.2 $ 2,347.25 - signo de dólar iniciales, finales cuando menos negativa
+@ N $ (11,2) $ (2,347.25) signo de dólar, en paréntesis cuando es negativo
+
+
+
+Internacional
+Formato de moneda Resultados
+@ N12_ `2 ~ F ~ 1 F 5430,50 Francia
+@ N ~ L. ~ 12 `L. 1.430.050 Italia
+@ N ~ € ~ 12.2 £ 1,240.50 Reino Unido
+@ N ~ kr ~ 12 `2 kr1.430, 50 Noruega
+@ N ~ DM ~ 12 `2 DM1.430, 50 Alemania
+@ N12_ `2 ~ ~ mk mk 1 430,50 Finlandia
+@ N12 `2 ~ ~ 1.430,50 kr kr Suecia
+
+
+Almacenamiento de sólo imágenes:
+Variable1 STRING (@ N_6v2)! Declarar como 6 bytes almacenados sin decimal
+ CÓDIGO
+ Variable1 = 1234,56! Asignar valor, tiendas '123456 'en el archivo
+ MENSAJE (FORMATO (Variable1, @ N_7.2)) Visualización con punto decimal: '1234 .56 '

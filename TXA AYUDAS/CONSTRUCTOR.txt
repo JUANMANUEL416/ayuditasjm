@@ -1,0 +1,164 @@
+ Win:Hab2
+ 
+ 
+ 
+ free(loc:qhab)
+ c# = 100
+ Y# = 5
+ PIS# = 0
+ B#  = 1
+ loc:sql = ' SELECT PISO, SECTOR, HABITACION, CAMA, NIVEL, DESCRIPCION, HABCAMA '&chr(13)&chr(10)&|
+           ' FROM   HHAB '&chr(13)&chr(10)&|
+           ' WHERE  NIVEL <> 3  AND ESTADOHAB <>''Inhabilitada'''&chr(13)&chr(10)&|
+           ' ORDER BY PISO, SECTOR, HABITACION, CAMA, NIVEL '
+
+ clear(wdum:record)
+ wdum{prop:sql} = loc:sql
+ loop until access:wdum.next()
+    if wdu:c5 = 1
+       IF ANT# = 4
+          Y# += 45
+       END
+       !B:linea azul antes del nivel
+       x# = create(c#, create:line)
+       x#{prop:color}  = color:blue
+       x#{prop:xpos}   = 10
+       x#{prop:ypos}   = y#
+       x#{prop:width}  = 487
+       x#{prop:height} = 0
+       x#{PROP:LINEWIDTH} = 2
+       X#{PROP:SCROLL} = TRUE
+       y# += 3
+       unhide(x#)
+       !stop(x#)
+       C# += 1
+       !E:linea azul antes del nivel
+
+       Y# += 5
+       PIS# + = 1
+       x# = CREATE(C#, CREATE:STRING)
+       x#{prop:xpos}   = 5
+       x#{prop:ypos}   = Y#
+       x#{prop:text}   = WDU:C6
+       X#{PROP:FONT,2} = 10
+       X#{PROP:FONT,3} = COLOR:BLUE
+       X#{PROP:FONT,4} = FONT:BOLD+FONT:ITALIC
+       X#{PROP:SCROLL} = TRUE
+       X#{PROP:TRN} = TRUE
+       Y# += 10
+    END
+    if wdu:c5 = 2
+       IF ANT# = 4
+          Y# += 45
+       END
+       !B:linea roja antes del nivel
+       x# = create(c#, create:line)
+       x#{prop:color}  = color:Red
+       x#{prop:xpos}   = 10
+       x#{prop:ypos}   = y#
+       x#{prop:width}  = 487
+       x#{prop:height} = 0
+       X#{PROP:SCROLL} = TRUE
+       y# += 3
+       unhide(x#)
+       C# += 1
+       !E:linea roja antes del nivel
+       x# = CREATE(C#, CREATE:STRING)
+       x#{prop:xpos}   = 10
+       x#{prop:ypos}   = Y#
+       x#{prop:text}   = WDU:C6
+       X#{PROP:FONT,2} = 10
+       X#{PROP:FONT,3} = COLOR:RED
+       X#{PROP:FONT,4} = FONT:BOLD+FONT:ITALIC
+       X#{PROP:SCROLL} = TRUE
+       X#{PROP:TRN} = TRUE
+       Y# += 10
+       B# = 1
+    END
+    if wdu:c5 = 4
+       IF ANT# = 4 AND B# = 1
+          Y# += 45
+       END
+       x# = CREATE(C#, CREATE:BUTTON)
+       x#{prop:xpos}   = ((B# - 1) * 90 ) + ( B# * 10 )
+       x#{prop:ypos}   = Y#
+       X#{PROP:WIDTH}  = 90
+       X#{PROP:HEIGHT} = 40
+       x#{prop:text}   = WDU:C6
+       clear(hhab:record)
+       HHAB:HABCAMA = wdu:c7
+       if access:hhab.tryfetch(HHAB:HHABHABITACION) then clear(hhab:record).
+       case hhab:estadohab
+       of 'Libre'
+          x#{prop:icon} = '.\iconos\libre.ico'
+       of 'Ocupada' OROF 'Temporal'
+          clear(hadm:record)
+          hadm:noadmision = HHAB:NOADMISION
+          if access:hadm.tryfetch(hadm:hadmnoadmision) then clear(hadm:record).
+          clear(ter:record)
+          ter:idtercero = hadm:idtercero
+          if access:ter.tryfetch(ter:teridtercero) then clear(ter:record).
+          !CREAR STRRING PARA COLOCAR LA RAZON SOCIAL
+          C# += 1
+          L# = create(c#, CREATE:text)
+          L#{prop:xpos}   = ((B# - 1) * 90 ) + ( B# * 10 )
+          L#{prop:ypos}   = Y#
+          L#{PROP:WIDTH}  = 90
+          L#{PROP:HEIGHT} = 24
+          L#{PROP:FONT,2} = 8
+          L#{PROP:FONT,3} = COLOR:BLACK
+          L#{PROP:FONT,4} = FONT:BOLD
+          L#{PROP:SCROLL} = TRUE
+          l#{prop:readonly} = true
+          L#{prop:text}   = clip(ter:razonsocial)
+          l#{prop:vscroll} = true
+          UNHIDE(L#)
+          x#{prop:ypos}   = Y#+24
+          X#{PROP:HEIGHT} = 15
+          clear(loc:qhab)
+          numboton   = x#
+          habcama    = hhab:habcama
+          noadmision = hadm:noadmision
+          xpos       = L#{prop:xpos}
+          ypos       = L#{prop:ypos}
+          wpos       = L#{PROP:WIDTH}
+          add(loc:qhab, numboton)
+       of 'Mantenimiento'
+          x#{prop:icon} = '.\iconos\mtto.ico'
+       End
+       X#{PROP:FONT,2} = 8
+       X#{PROP:FONT,3} = COLOR:GREEN
+       X#{PROP:FONT,4} = FONT:BOLD+FONT:ITALIC
+       X#{PROP:SCROLL} = TRUE
+
+       IF B# = 5
+          B# = 1
+       ELSE
+          B# += 1
+       END
+    END
+    ANT# = WDU:C5
+    unhide(x#)
+    C# += 1
+ End
+
+
+!LOOP C#= 101 TO 148
+!    COL#+=1
+!    IF COL# = 3 THEN COL#=4. !PASILLO :)
+!    IF COL# = 6
+!        COL#  = 1
+!        FIL# += 1
+!    END
+!    X# = CREATE(C#, CREATE:button)
+!    IF ERRORCODE() THEN STOP (ERROR()).
+!    X#{PROP:XPOS} = COL# * 30
+!    X#{PROP:YPOS} = FIL# * 12
+!    X#{PROP:TEXT} = C#-100
+!    X#{PROP:BACKGROUND} = COLOR:YELLOW
+!    X#{PROP:SKIP} = True
+!    X#{PROP:LEFT} = True
+!    X#{PROP:WIDTH} = 25
+!    X#{PROP:HEIGHT} = 10
+!    UNHIDE(X#)
+!END

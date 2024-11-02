@@ -1,0 +1,719 @@
+IF EXISTS(SELECT NAME FROM SYSOBJECTS WHERE NAME='SPK_IZSOL_OME24_FALTANTES_IZSOLD_SIN_FNK_FECHA' AND XTYPE='P')
+BEGIN
+   DROP PROCEDURE SPK_IZSOL_OME24_FALTANTES_IZSOLD_SIN_FNK_FECHA
+END
+GO
+CREATE PROC DBO.SPK_IZSOL_OME24_FALTANTES_IZSOLD_SIN_FNK_FECHA
+@CNSIZSOLM    VARCHAR(20),
+@IDSEDE       VARCHAR(5),
+@USUARIO      VARCHAR(12)  
+WITH ENCRYPTION
+AS 
+DECLARE @NOADMISION     VARCHAR(16),     @VECES           INT,           @HABCAMA          VARCHAR(10),    @SECTOR           VARCHAR(10),
+        @CODOM          VARCHAR(10),     @INFUSION        SMALLINT,      @FRECUENCIA       DECIMAL(14,2),  @HORAULTIMADOSIS  VARCHAR(5),
+        @FECHAMAX       DATETIME,        @FECHAULT        DATETIME,      @IDSERVICIO       VARCHAR(20),    @FECHAHC          DATETIME,
+        @FECHAPRIMER    DATETIME,        @VEZ             INT,           @QTOTDOSIS        DECIMAL(14,2),  @QTOTMEZCLA       DECIMAL(14,2),
+        @CNSHBALI       VARCHAR(20),     @NCONSECUTIVO    INT,           @CANTIDAD         DECIMAL(18,6),  @CANTIDADBOLO     DECIMAL(14,2),
+        @NCONSECUTIVOD  INT,             @CREAR           INT,           @IDSERVICIOMEZCLA VARCHAR(20),    @QMEZCLA          DECIMAL(14,2),
+        @NUMHORASTOT    INT,             @NUMHORASIMP     INT,           @NUMHORASCON      INT,            @CNSIZSOLD        VARCHAR(20),
+        @CNSIZSOL       VARCHAR(20),     @DURACIONIMP     DECIMAL(14,2), @QIMPSERVICIO     DECIMAL(14,2),  @QIMPMEZCLA       DECIMAL(14,2),
+        @IDSEDEHAB      VARCHAR(5),      @IDBODEGAATIENDE VARCHAR(20),   @CLASEHTX         VARCHAR(2),     @FECHAULTHHOM     DATETIME,
+        @RAZONNEC       SMALLINT,        @HORAAM          SMALLINT,      @QAM              DECIMAL(14,2),  @HORAPM           SMALLINT,       @QPM   DECIMAL(14,2),
+        @FEC1           DATETIME,        @FEC2            DATETIME,      @TIP              SMALLINT,       @GOTEO            DECIMAL(14,2), 
+        @INDBOLO        SMALLINT,        @Q1              DECIMAL(14,2), @Q2               DECIMAL(14,2) , @DURACION         DECIMAL(14,2), 
+        @HORASXDOSIS    DECIMAL(14,2)=0, @SUMHXD          DECIMAL(14,2) = 0,
+        @QDOSIS         DECIMAL(14,2)=0, @NUTPHADM        SMALLINT,      @FECHAHCA         DATETIME,       @CONSECUTIVOHCA   VARCHAR(13),
+        @IDSERVICIONUTP VARCHAR(20),     @CANTIDADNUTP    DECIMAL(18,6), @CANTDOSIS        DECIMAL(14,2),  @CANTIDADT        DECIMAL(14,2),
+        @JERARQUIA      VARCHAR(20),     @IDSERVICIODEF   VARCHAR(20),   @CANTIDADEF       DECIMAL(14,2),  @VECES_EN_T       DECIMAL(14,2),
+        @T_ESTABILIDAD  DECIMAL(14,2),   @EQUICC          DECIMAL(14,2), @CNSHCA           VARCHAR(20),    @SOBRANTEN        DECIMAL(14,2), 
+        @EQUICCINF      DECIMAL(14,2),   @EQUIVALE        DECIMAL(14,2), @SOBRANTE         DECIMAL(14,2),  @NUWTDOSIS        DECIMAL(14,2),
+        @CNSHDUXS       VARCHAR(20),     @NUEVOHDUXS      VARCHAR(20),   @PEDIR            INT,            @PASANDO          INT,
+        @IDSERVICIOANT VARCHAR(20),      @NOMBRESER       VARCHAR(100),  @TDOSISINF        INT
+BEGIN
+   --REVISAMOS FUNCIONAMIENTO DE CENTRAL DE MEZCLAS
+   SELECT @HORAULTIMADOSIS  = COALESCE(DBO.FNK_VALORVARIABLE('HORAULTIMADOSIS'), '14')
+   
+   IF ISNUMERIC(@HORAULTIMADOSIS) = 0
+   BEGIN
+      RAISERROR('Variable HORAULTIMADOSIS no definida con hora',16,1)
+      RETURN
+   END     
+   ELSE
+   BEGIN
+      IF CONVERT(INT,@HORAULTIMADOSIS) > 23
+      BEGIN
+         RAISERROR('Variable HORAULTIMADOSIS con hora Invalida',16,1)
+         RETURN
+      END
+   END
+   
+   SELECT @FECHAHC = FECHA FROM IZSOLM WHERE CNSIZSOLM = @CNSIZSOLM
+
+   SELECT @FECHAHC = CONVERT(DATETIME,CONVERT(VARCHAR(10),@FECHAHC,103)+ ' '+ dbo.FNK_VALORVARIABLE('HORAULTIMADOSIS')+':00')
+   SELECT @FECHAMAX = CONVERT(DATETIME,CONVERT(VARCHAR(10),DATEADD(DAY,1,CONVERT(date,CONVERT(VARCHAR(10),GETDATE(),103))),103)+ ' '+dbo.FNK_VALORVARIABLE('HORAULTIMADOSIS')+':00')
+
+
+   SELECT @PASANDO=0
+   DECLARE H_C CURSOR FOR
+   SELECT HHAB.HABCAMA, HHAB.SECTOR, HHAB.NOADMISION, HHAB.IDSEDE
+   FROM   HHAB 
+   WHERE  HHAB.CLASE     = 'Cama'
+   AND    HHAB.ESTADOHAB = 'Ocupada' 
+   AND    COALESCE(HHAB.NOADMISION,'') <> ''
+   AND    EXISTS ( SELECT * FROM HADM  
+                  WHERE HADM.NOADMISION=HHAB.NOADMISION
+                  AND FACTURABLE=1
+                  AND COALESCE(HADM.CERRADA,0)=0
+                 )
+   AND   EXISTS(SELECT * FROM HHOM WHERE HHOM.NOADMISION=HHAB.NOADMISION  
+                 AND NOT EXISTS(SELECT * FROM IZSOL A INNER JOIN IZSOLD B ON A.CNSIZSOL=B.CNSIZSOL
+                                 WHERE HHOM.NOADMISION=A.NOADMISION
+                                 AND HHOM.IDSERVICIO=B.IDSERVICIO
+                                 AND A.CNSIZSOLM=@CNSIZSOLM))
+   OPEN H_C
+   FETCH NEXT FROM H_C
+   INTO @HABCAMA, @SECTOR, @NOADMISION, @IDSEDEHAB
+   WHILE @@FETCH_STATUS = 0  
+   BEGIN
+      PRINT 'NOADMISION='+@NOADMISION
+      SELECT @CNSHCA=MAX(CONSECUTIVO) FROM HCA WHERE NOADMISION=@NOADMISION AND CLASE='HC' AND CLASEPLANTILLA=DBO.FNK_VALORVARIABLE('HCPLANTILLARED')
+      SELECT @NUTPHADM = 0  --Con esta variable controlamos por cada admisión que solo tome el item de nutricion parenteral como uno solo
+      -- AQUI DEBEMOS TOMAR LAS ORDENES MEDICAS DE CADA ADMISION  
+      PRINT 'INICIO EL CURSOR'   
+      DECLARE SER_C CURSOR FOR
+      SELECT HHOM.IDSERVICIO, HHOM.CANTIDAD, HHOM.FRECUENCIA, SER.CLASEHTX, HHOM.CODOM, 
+             HHOM.FECHAULT, COALESCE(HHOM.IDSERVICIOMEZCLA,''), COALESCE(HHOM.QMEZCLA,0), HHOM.QIMPSERVICIO, HHOM.QIMPMEZCLA, 
+             COALESCE(HHOM.DURACIONIMP,0.00), COALESCE(HHOM.RAZONNEC,0), HHOM.HORAAM, HHOM.QAM, HHOM.HORAPM, HHOM.QPM,
+             COALESCE(HHOM.GOTEO,0),COALESCE(HHOM.DURACION,24)
+      FROM   HHOM INNER JOIN SER ON HHOM.IDSERVICIO = SER.IDSERVICIO
+      WHERE  HHOM.NOADMISION = @NOADMISION
+      AND    HHOM.ESTADO         = 'A'
+      AND    COALESCE(HHOM.RAZONNEC,0) <> 1  -- NO SE GENERA HOJA DE TRATAMIENTO PARA LOS DE RAZON NECESARIA
+      AND NOT EXISTS(SELECT * FROM IZSOL A INNER JOIN IZSOLD B ON A.CNSIZSOL=B.CNSIZSOL
+                                 WHERE HHOM.NOADMISION=A.NOADMISION
+                                 AND HHOM.IDSERVICIO=B.IDSERVICIO
+                                 AND A.CNSIZSOLM=@CNSIZSOLM)
+      OPEN SER_C
+      FETCH NEXT FROM SER_C
+      INTO @IDSERVICIO, @CANTIDAD, @FRECUENCIA, @CLASEHTX, @CODOM, @FECHAULTHHOM, @IDSERVICIOMEZCLA, @QMEZCLA,  
+           @QIMPSERVICIO, @QIMPMEZCLA, @DURACIONIMP, @RAZONNEC, @HORAAM, @QAM, @HORAPM, @QPM, @GOTEO,@DURACION
+      WHILE @@FETCH_STATUS = 0     
+      BEGIN 
+          IF @IDSERVICIOANT<>@IDSERVICIO
+          BEGIN
+             SELECT @IDSERVICIOANT=@IDSERVICIO,@PASANDO=1
+          END
+          ELSE
+          BEGIN
+            SELECT @PASANDO=@PASANDO+1
+          END
+          PRINT 'INICIO DE CURSOR DEL SERVICIO '+COALESCE(@IDSERVICIO,'NO SERVICOO')+'  NOADMISION '+COALESCE(@NOADMISION,'')+' PASANDO '+LTRIM(RTRIM(STR(@PASANDO)))         
+         --si es nutricion parenteral debemos colocr en las variables los datos pero de hcatd y hacerlo una sola vez
+         IF @CODOM = DBO.FNK_VALORVARIABLE('OMCODNUTRICIONP')
+         BEGIN
+            IF @NUTPHADM = 0
+            BEGIN
+               SELECT @FECHAHCA = MAX(HCA.FECHA) 
+               FROM   HCATD INNER JOIN HCA ON HCATD.CONSECUTIVO = HCA.CONSECUTIVO 
+               WHERE  HCA.NOADMISION = @NOADMISION
+               AND    HCATD.CODOM    = @CODOM 
+               SELECT @CONSECUTIVOHCA = HCA.CONSECUTIVO
+               FROM   HCA INNER JOIN HCATD ON HCA.CONSECUTIVO = HCATD.CONSECUTIVO
+               WHERE  HCA.NOADMISION = @NOADMISION
+               AND    HCATD.CODOM    = @CODOM 
+               AND    HCA.FECHA      = @FECHAHCA
+               SELECT @FECHAULTHHOM = @FECHAHCA
+               SELECT @IDSERVICIO = HCATD.IDSERVICIO, @CANTIDAD = HCATD.CANTIDAD, 
+                      @FRECUENCIA = CASE WHEN @INFUSION IN (1,2, 3) THEN CASE WHEN HCATD.FRECUENCIA < 1 THEN 2 ELSE HCATD.FRECUENCIA END 
+                                                  ELSE CASE WHEN HCATD.FRECUENCIA < 1 THEN 1 ELSE HCATD.FRECUENCIA END
+                                            END, 
+                      @CLASEHTX = SER.CLASEHTX,  @IDSERVICIOMEZCLA = COALESCE(HCATD.IDSERVICIOMEZCLA,''), @QMEZCLA = COALESCE(HCATD.QMEZCLA,0), 
+                      @QIMPSERVICIO = HCATD.QIMPSERVICIO,  @QIMPMEZCLA = HCATD.QIMPMEZCLA, 
+                      @DURACIONIMP  = COALESCE(HCATD.DURACIONIMP,0.00), @RAZONNEC = COALESCE(HCATD.RAZONNEC,0), @HORAAM = HCATD.HORAAM,  @QAM = HCATD.QAM, 
+                      @HORAPM = HCATD.HORAPM, @QPM = HCATD.QPM, 
+                      @GOTEO  = COALESCE(HCATD.GOTEO,0)
+               FROM   HCATD INNER JOIN SER ON HCATD.IDSERVICIO = SER.IDSERVICIO
+               WHERE  HCATD.CONSECUTIVO = @CONSECUTIVOHCA 
+               AND    HCATD.CODOM       = @CODOM
+               AND    HCATD.CLASE       <> 'S'
+               AND    COALESCE(HCATD.RAZONNEC,0) <> 1  
+
+               SELECT @NUTPHADM = 1 
+            END
+            ELSE
+            BEGIN
+               FETCH NEXT FROM SER_C
+               INTO @IDSERVICIO, @CANTIDAD, @FRECUENCIA, @CLASEHTX, @CODOM, @FECHAULTHHOM, @IDSERVICIOMEZCLA, @QMEZCLA,  
+                    @QIMPSERVICIO, @QIMPMEZCLA, @DURACIONIMP, @RAZONNEC, @HORAAM, @QAM, @HORAPM, @QPM, @GOTEO,@DURACION
+               CONTINUE
+            END
+         END
+
+         IF (SELECT DBO.FNK_VALORVARIABLE('OMCODMEZCLA')) = @CODOM
+            SELECT @INFUSION = 1
+         ELSE
+            IF (SELECT DBO.FNK_VALORVARIABLE('OMCODLIQUIDOSPARE')) = @CODOM  
+               SELECT @INFUSION = 2
+            ELSE
+               IF (SELECT DBO.FNK_VALORVARIABLE('OMCODNUTRICIONP')) = @CODOM  
+                  SELECT @INFUSION = 3
+               ELSE
+                  SELECT @INFUSION = 0
+
+         IF @INFUSION IN (1,2, 3) 
+            IF @FRECUENCIA < 1
+               SELECT @FRECUENCIA = 2
+         ELSE
+            IF @FRECUENCIA < 1
+               SELECT @FRECUENCIA = 2
+
+         --VAMOS A REVISAR ULTIMA HORA DE APLICACION
+         IF @RAZONNEC <> 2
+         BEGIN
+            PRINT '@FECHAULT EN @RAZONNEC <> 2'
+            SELECT @FECHAULT = DATEADD(HOUR,24,MAX(HBALIDD.FECHA))
+            FROM   HBALID INNER JOIN HBALI   ON HBALID.CNSHBALI = HBALI.CNSHBALI
+                          INNER JOIN HBALIDD ON HBALID.CNSHBALI = HBALIDD.CNSHBALI
+                                            AND HBALID.NTIPO    = HBALIDD.NTIPO
+                                            AND HBALID.NCONSECUTIVO = HBALIDD.NCONSECUTIVO  
+            WHERE  HBALI.NOADMISION  = @NOADMISION
+            AND    HBALID.IDSERVICIO = @IDSERVICIO
+            AND    HBALID.CLASE      = @CODOM
+
+            IF @FECHAULT IS NULL
+            BEGIN
+               SELECT @FECHAULT =    @FECHAHC
+            END
+         END
+         ELSE
+         BEGIN
+            --ES DE TIPO  AM PM   CON DIFERENTES DOSIS
+            SELECT @TIP = 0        
+            IF ( CONVERT(VARCHAR,GETDATE(),104) = CONVERT(VARCHAR,@FECHAMAX,104) )
+            BEGIN
+               IF @HORAAM >= DATEPART(HH,GETDATE())
+               BEGIN
+                  SELECT @FEC1 = CONVERT(DATETIME,CONVERT(VARCHAR(10),CONVERT(VARCHAR(10),GETDATE(),103))+ ' '+CONVERT(VARCHAR(2),@HORAAM)+':00')
+                  SELECT @TIP   = 1, @Q1 = @QAM
+               END
+               ELSE 
+                   SELECT @TIP  = 3
+            END
+            ELSE
+            BEGIN
+               IF @HORAPM >= DATEPART(HH,GETDATE()) 
+               BEGIN
+                  SELECT @FEC1 = CONVERT(DATETIME,CONVERT(VARCHAR(10),CONVERT(VARCHAR(10),GETDATE(),103))+ ' '+CONVERT(VARCHAR(2),@HORAPM)+':00')
+                  SELECT @FEC2 = CONVERT(DATETIME,CONVERT(VARCHAR(10),CONVERT(VARCHAR(10),@FECHAMAX,103))+ ' '+CONVERT(VARCHAR(2),@HORAAM)+':00')
+                  SELECT @TIP   = 2, @Q1 = @QPM, @Q2 = @QAM
+               END
+               ELSE
+               BEGIN
+                  SELECT @FEC1 = CONVERT(DATETIME,CONVERT(VARCHAR(10),CONVERT(VARCHAR(10),@FECHAMAX,103))+ ' '+CONVERT(VARCHAR(2),@HORAAM)+':00')
+                  SELECT @TIP   = 1, @Q1 = @QAM
+               END
+            END
+            PRINT '@FECHA1='+CONVERT(VARCHAR(30),COALESCE(@FEC1,'01/01/1800'))+'//@FECHA2='+CONVERT(VARCHAR(30),COALESCE(@FEC2,'01/01/1800'))        
+         END
+
+         PRINT '@ADMISION='+@NOADMISION + ' // @IDSERVICIO ='+@IDSERVICIO+'//@FECHAULT='+CONVERT(VARCHAR(20),COALESCE(@FECHAULT,'01/01/1900'))+
+		   '//@FECHAMAX='+CONVERT(VARCHAR(20),COALESCE(@FECHAMAX,'01/01/1900'))
+
+         IF @RAZONNEC = 2
+         BEGIN
+            SELECT @FECHAULT = @FEC1, @CANTIDAD = @Q1
+         END
+         ELSE
+         BEGIN
+            PRINT '@FECHAULT '+CONVERT(VARCHAR,@FECHAULT,109)
+            PRINT 'COMPARACION '+CONVERT(VARCHAR,DATEADD(DAY, -1, @FECHAHC),109)
+            IF @FECHAULT < DATEADD(DAY, -1, @FECHAHC)
+            BEGIN
+               PRINT '@FECHAULT < DATEADD(DAY, -1, @FECHAHC)'
+               SELECT @FECHAULT = @FECHAHC
+               PRINT '@FECHAULT'+CONVERT(VARCHAR,@FECHAULT,109)
+            END
+            ELSE
+            BEGIN
+               IF CONVERT(VARCHAR,@FECHAULT,104)=CONVERT(VARCHAR,GETDATE()+1,104)  
+               BEGIN
+                  PRINT 'ME DEVUELVO UN DIA'
+                  SELECT @FECHAULT=DATEADD(DAY, -1, @FECHAULT)
+                  PRINT 'AGREGRO LA PRIMERA PARA QUE SEA DESPUES DE LA ULTIMA DOSIS '
+                  SELECT @FECHAULT = (DATEADD(HOUR,@FRECUENCIA,@FECHAULT))
+               END
+               ELSE
+               BEGIN 
+                  PRINT 'AGREGRO LA PRIMERA PARA QUE SEA DESPUES DE LA ULTIMA DOSIS '
+                  IF COALESCE(@FRECUENCIA,2)<24
+                  BEGIN
+                     SELECT @FECHAULT =  (DATEADD(HOUR,@FRECUENCIA,@FECHAULT))  
+                     PRINT '@FECHAULT FRECUENCA DIFRENTE A 24'+CONVERT(VARCHAR,@FECHAULT,109) 
+                  END
+                  ELSE
+                  BEGIN
+                     PRINT 'SE DEJA TAL CUAL '
+                  END               
+               END
+
+            END
+         END
+         PRINT 'NO ME DEVOLVI'
+         SELECT @FECHAPRIMER = @FECHAULT
+         --PRINT '@IDSERVICIO='+@IDSERVICIO +'//CODOM='+@CODOM
+         PRINT 'ANTES DEL WHILE'
+         --SELECT @FECHAULT = CONVERT(DATETIME,CONVERT(VARCHAR(10),@FECHAULT,103)+ ' '+ dbo.FNK_VALORVARIABLE('HORAULTIMADOSIS')+':00')
+		   PRINT '@FECHAULT='+CONVERT(VARCHAR(20),COALESCE(@FECHAULT,'01/01/1900'))
+		   PRINT '@@FECHAMAX='+CONVERT(VARCHAR(20),COALESCE(@FECHAMAX,'01/01/1900'))
+
+         SELECT @VEZ = 1, @QTOTDOSIS = 0, @QTOTMEZCLA = 0
+         WHILE @FECHAULT <=  @FECHAMAX
+         BEGIN
+            PRINT 'COMIENZA EL WHILE'
+		      PRINT '@FECHAULT='+CONVERT(VARCHAR(20),COALESCE(@FECHAULT,'01/01/1900'))
+		      PRINT '@@FECHAMAX='+CONVERT(VARCHAR(20),COALESCE(@FECHAMAX,'01/01/1900'))
+ 
+            PRINT 'ME PREPRARO PARA INICIAR CONTINUAR WHILE'
+            PRINT '@INFUSION ==='+LTRIM(RTRIM(STR(@INFUSION)))
+            PRINT 'ANTES DE AGREGAR LA FRECUENCIA'
+		      PRINT '@FECHAULT='+CONVERT(VARCHAR(20),COALESCE(@FECHAULT,'01/01/1900'))
+		      PRINT '@@FECHAMAX='+CONVERT(VARCHAR(20),COALESCE(@FECHAMAX,'01/01/1900'))
+            IF COALESCE(@FRECUENCIA,0)<1
+            BEGIN
+               SELECT @FRECUENCIA=2
+            END
+            SELECT @FECHAULT =  (DATEADD(HOUR,@FRECUENCIA,@FECHAULT))
+            PRINT 'YA AGREGUE UNA FRECUENCIA'+STR(@FRECUENCIA)  	
+		      PRINT '@FECHAULT='+CONVERT(VARCHAR(20),COALESCE(@FECHAULT,'01/01/1900'))
+		      PRINT '@@FECHAMAX='+CONVERT(VARCHAR(20),COALESCE(@FECHAMAX,'01/01/1900'))           
+            	      
+            IF @INFUSION <> 1
+            BEGIN
+               PRINT ' LLEVO EL TOTAL  @QTOTDOSIS ==='+LTRIM(RTRIM(STR(@QTOTDOSIS)))
+               PRINT '@CANTIDAD  +++'+LTRIM(RTRIM(STR(@CANTIDAD)))
+               SELECT @QTOTDOSIS  = @QTOTDOSIS + @CANTIDAD 
+               SELECT @QTOTMEZCLA = @QTOTMEZCLA + @QMEZCLA
+               PRINT ' LLEVO EL TOTAL   @QTOTDOSIS  DESPUES DE AGREGAR==='+LTRIM(RTRIM(STR(@QTOTDOSIS)))
+            END
+            IF @RAZONNEC = 2 
+            BEGIN
+               PRINT 'INGRESO POR @RAZONNEC = 2 '
+               IF @TIP = 2
+                  SELECT @FECHAULT =  @FEC2, @CANTIDAD = @Q2
+               ELSE
+                  IF @TIP = 1
+                     PRINT 'INGRESO POR ACA RARO....'
+                     SELECT @FECHAULT = @FECHAMAX + 1
+            END
+            IF @RAZONNEC = 2 AND @TIP = 2 AND @VEZ = 2  --ROMPEMOS SI ES DE AMPM Y YA VAN LAS DOS HORAS INCLUIDAS
+            BEGIN
+               PRINT 'ROMPIMIENTO'
+               BREAK
+            END
+            SELECT @VEZ += 1 
+            PRINT 'DEBO REGRESAR +'+STR(@VEZ)
+            PRINT 'AGREGO FECHA PARA EL WHIELE'
+		      PRINT '@FECHAULT='+CONVERT(VARCHAR(20),COALESCE(@FECHAULT,'01/01/1900'))
+		      PRINT '@@FECHAMAX='+CONVERT(VARCHAR(20),COALESCE(@FECHAMAX,'01/01/1900'))  
+         END --SALI DE CICLO DE FRECUENCIA
+         PRINT 'FIN DEFINITIVO WHILE'
+         IF @INFUSION = 1
+         BEGIN
+            SELECT @EQUICCINF=COALESCE(EQUICCINF,0),@EQUIVALE=(@CANTIDAD/EQUICC)*EQUICCINF  FROM SER  WHERE IDSERVICIO=@IDSERVICIO
+            SELECT @NUMHORASTOT  = DATEDIFF(HH, @FECHAPRIMER , @FECHAMAX)
+            SELECT @NUMHORASIMP = CEILING(@DURACIONIMP/60.00)
+            SELECT @NUMHORASCON = @NUMHORASTOT - @NUMHORASIMP,@QDOSIS=0
+            --INICIO JFRANCO 30/05/2015
+            SELECT @HORASXDOSIS   =  CASE WHEN (CASE WHEN COALESCE(@EQUIVALE,0)<=0 THEN 0 ELSE @EQUIVALE END+CASE WHEN COALESCE(@QMEZCLA,0)<=0 THEN 0 ELSE @QMEZCLA END)>0 
+                                          THEN (CASE WHEN COALESCE(@EQUIVALE,0)<=0 THEN 0 ELSE @EQUIVALE END+CASE WHEN COALESCE(@QMEZCLA,0)<=0 THEN 0 ELSE @QMEZCLA END)/@GOTEO
+                                          ELSE 0 
+                                     END
+            PRINT '@QIMPSERVICIO ='+CONVERT(VARCHAR(20),@QIMPSERVICIO)
+            PRINT '@QIMPMEZCLA ='+CONVERT(VARCHAR(20),@QIMPMEZCLA)
+            PRINT '@GOTEO ='+CONVERT(VARCHAR(20),@GOTEO)
+            PRINT '@HORASXDOSIS = '+CONVERT (VARCHAR (20),@HORASXDOSIS)
+
+            WHILE (@SUMHXD <= @NUMHORASCON)
+            BEGIN
+               PRINT 'EN CICLO'
+               IF COALESCE(@HORASXDOSIS,0)<=0
+               BEGIN
+                  BREAK
+               END
+               SELECT @QDOSIS = @QDOSIS+1
+               SELECT @SUMHXD = @SUMHXD+@HORASXDOSIS
+               PRINT @QDOSIS
+               PRINT @SUMHXD
+            END
+
+            SELECT @QTOTDOSIS   = COALESCE(@QIMPSERVICIO,0)+(@CANTIDAD * @QDOSIS)
+            SELECT @QTOTMEZCLA  = COALESCE(@QIMPMEZCLA,0)+(@QMEZCLA * @QDOSIS)
+            --SELECT @QTOTDOSIS   = @QIMPSERVICIO * @NUMHORASIMP  + @CANTIDAD * @NUMHORASCON
+            --SELECT @QTOTMEZCLA  = @QIMPMEZCLA   * @NUMHORASIMP  + @QMEZCLA  * @NUMHORASCON
+            SELECT @QDOSIS =0
+            SELECT @SUMHXD =0
+            --FINAL JFRANCO 30/05/2014
+         END
+         --GENERAR IZSOL 
+         --PRINT 'VOY A GENERAL IZSOL NOADMISION = '+@NOADMISION
+         --SELECT COUNT(*) FROM IZSOL WHERE COALESCE(NOADMISION,'') = @NOADMISION AND COALESCE(CNSIZSOLM,'') = @CNSIZSOLM
+         IF (SELECT COUNT(*) FROM IZSOL WHERE COALESCE(NOADMISION,'') = @NOADMISION AND COALESCE(CNSIZSOLM,'') = @CNSIZSOLM
+             AND    CLASE = '24HORAS') = 0
+         BEGIN
+            SELECT @CNSIZSOL = ''
+            EXEC SPK_GENCONSECUTIVO '01',@IDSEDE,'@IZSOL', @CNSIZSOL OUTPUT  
+            SELECT @CNSIZSOL = @IDSEDE + REPLACE(SPACE(10 - LEN(@CNSIZSOL))+LTRIM(RTRIM(@CNSIZSOL)),SPACE(1),0)  
+            PRINT '@CNSIZSOL == '+@CNSIZSOL
+            SELECT @IDBODEGAATIENDE = IDBODEGALOG FROM SED WHERE IDSEDE = @IDSEDEHAB
+            
+            INSERT INTO IZSOL (CNSIZSOL, FECHASOL, USUARIOSOL, ESTADO, IDBODEGAATIENDE, SECTOR, CLASE, NOADMISION, CNSIZSOLM,CONSECUTIVOHCA,IDSEDE )
+            SELECT @CNSIZSOL, @FECHAHC, @USUARIO, 1, @IDBODEGAATIENDE, @SECTOR, '24HORAS', @NOADMISION, @CNSIZSOLM,@CNSHCA,@IDSEDEHAB
+         END
+         ELSE
+         BEGIN
+            SELECT @CNSIZSOL = CNSIZSOL FROM IZSOL WHERE COALESCE(NOADMISION,'') = @NOADMISION AND COALESCE(CNSIZSOLM,'') = @CNSIZSOLM
+             PRINT '@CNSIZSOL == '+@CNSIZSOL
+         END
+         IF @INFUSION = 3 -- NUTRICION PARENTERAL
+         BEGIN
+            DECLARE HCATDH_C CURSOR FOR
+            SELECT IDSERVICIOD, CEILING (HCATDH.CANTIDAD/SER.EQUICC)
+            FROM   HCATDH INNER JOIN SER ON HCATDH.IDSERVICIOD = SER.IDSERVICIO
+            WHERE  HCATDH.CONSECUTIVO = @CONSECUTIVOHCA
+            AND    HCATDH.CODOM       = @CODOM
+            AND    HCATDH.IDSERVICIO  = @IDSERVICIO
+            OPEN HCATDH_C
+            FETCH NEXT FROM HCATDH_C
+            INTO @IDSERVICIONUTP, @CANTIDADNUTP
+            WHILE @@FETCH_STATUS = 0     
+            BEGIN   
+               SELECT @CNSIZSOLD = ''
+               EXEC SPK_GENCONSECUTIVO '01',@IDSEDE,'@IZSOLD', @CNSIZSOLD OUTPUT  
+               SELECT @CNSIZSOLD = @IDSEDE + REPLACE(SPACE(10 - LEN(@CNSIZSOLD))+LTRIM(RTRIM(@CNSIZSOLD)),SPACE(1),0)  
+               INSERT INTO IZSOLD (CNSIZSOLD , CNSIZSOL , IDARTICULO , CANTIDADSOL , ESTADO, CODOM, CANTIDAD, FRECUENCIA, NUMDOSIS,
+                                   CANTIDADBOLO, QIMPREGNACION, DURACION, IDSERVICIO,CNSHBALI,TIPOM,IDPRINCIPIO) 
+               SELECT @CNSIZSOLD, @CNSIZSOL, SER.IDARTICULO, @CANTIDADNUTP, 1, @CODOM,  @CANTIDAD, @FRECUENCIA, 0, 0, @QIMPSERVICIO, 
+               DATEDIFF(HH,@FECHAPRIMER,@FECHAMAX), SER.IDSERVICIO,@CNSHBALI,'NP',IDSERVICIO
+               FROM   SER
+               WHERE  IDSERVICIO = @IDSERVICIONUTP
+               FETCH NEXT FROM HCATDH_C
+               INTO @IDSERVICIONUTP, @CANTIDADNUTP   
+            END
+            CLOSE HCATDH_C
+            DEALLOCATE HCATDH_C
+         END
+         ELSE
+         BEGIN
+             SELECT @CNSIZSOLD = ''
+             EXEC SPK_GENCONSECUTIVO '01',@IDSEDE,'@IZSOLD', @CNSIZSOLD OUTPUT  
+             SELECT @CNSIZSOLD = @IDSEDE + REPLACE(SPACE(10 - LEN(@CNSIZSOLD))+LTRIM(RTRIM(@CNSIZSOLD)),SPACE(1),0)  
+             PRINT 'Reviso Tiempo de Estabilidad y si Esta Dosificado'
+     
+             IF COALESCE(DBO.FNK_VALORVARIABLE('MTESTABIDOSIS'),'NO')='SI' AND (SELECT COALESCE(MDOSIF,0) FROM SER  WHERE IDSERVICIO=@IDSERVICIO)=1
+             BEGIN
+                SELECT @T_ESTABILIDAD=T_ESTABILIDAD,@EQUICC=EQUICC,@NOMBRESER=LEFT(DESCSERVICIO,100) FROM SER WHERE IDSERVICIO=@IDSERVICIO
+                PRINT 'ESTE ES EL SERVICIO =='+@NOMBRESER
+                IF @INFUSION=1
+                BEGIN
+                   PRINT 'INGRESO POR INFUSION'
+                   INSERT INTO IZSOLD (CNSIZSOLD , CNSIZSOL , IDARTICULO , CANTIDADSOL , ESTADO, CODOM, CANTIDAD, FRECUENCIA, NUMDOSIS,
+                                       CANTIDADBOLO, QIMPREGNACION, DURACION, IDSERVICIO,CNSHBALI)
+                   SELECT @CNSIZSOLD, @CNSIZSOL, SER.IDARTICULO, CASE COALESCE(SER.MDOSIF,0) WHEN 1 THEN CEILING(@QTOTDOSIS/SER.EQUICC) ELSE @QTOTDOSIS END, 
+                          1, @CODOM, @CANTIDAD, @FRECUENCIA,  CASE COALESCE(SER.MDOSIF,0) WHEN 1 THEN CEILING(@QTOTDOSIS/SER.EQUICC) ELSE @QTOTDOSIS END, 0,
+                          @QIMPSERVICIO,@DURACION, @IDSERVICIO,@CNSHBALI
+                   FROM   SER
+                   WHERE  IDSERVICIO = @IDSERVICIO
+                END
+                ELSE
+                BEGIN
+                   IF @FRECUENCIA>=@T_ESTABILIDAD
+                   BEGIN 
+                      PRINT' @FRECUENCIA>=@T_ESTABILIDAD'
+                      SELECT @CANTDOSIS=(@CANTIDAD/CASE WHEN COALESCE(SER.EQUICC,0)<=0 THEN 1 ELSE SER.EQUICC END) FROM SER WHERE IDSERVICIO=@IDSERVICIO
+                      SELECT @CANTIDADT=CASE WHEN @VEZ=1 THEN @VEZ ELSE @VEZ-1 END * CEILING(@CANTDOSIS/1)
+                      INSERT INTO IZSOLD (CNSIZSOLD , CNSIZSOL , IDARTICULO , CANTIDADSOL , ESTADO, CODOM, CANTIDAD, FRECUENCIA, NUMDOSIS,
+                                          CANTIDADBOLO, QIMPREGNACION, DURACION, IDSERVICIO,CNSHBALI)
+                      SELECT @CNSIZSOLD, @CNSIZSOL, SER.IDARTICULO,@CANTIDADT,1, @CODOM, @CANTIDAD, @FRECUENCIA, CASE WHEN @VEZ=1 THEN @VEZ ELSE @VEZ-1 END,
+                             0, @QIMPSERVICIO,@DURACION, @IDSERVICIO,@CNSHBALI
+                      FROM   SER
+                      WHERE  IDSERVICIO = @IDSERVICIO
+                   END
+                   ELSE
+                   BEGIN
+                      IF @FRECUENCIA<@T_ESTABILIDAD
+                      BEGIN
+                         IF (@T_ESTABILIDAD <= @DURACION) OR (@CODOM=DBO.FNK_VALORVARIABLE('OMCODLIQUIDOSPARE'))
+                         BEGIN
+                            PRINT ' @FRECUENCIA<@T_ESTABILIDAD'
+                            PRINT '@T_ESTABILIDAD='+LTRIM(RTRIM(STR(@T_ESTABILIDAD)))+' @FRECUENCIA '+LTRIM(RTRIM(STR(@FRECUENCIA))) 
+                            SELECT @VECES_EN_T=(@T_ESTABILIDAD/@FRECUENCIA) 
+
+                            SELECT @CANTDOSIS=(@CANTIDAD/CASE WHEN COALESCE(SER.EQUICC,0)<=0 THEN 1 ELSE SER.EQUICC END) FROM SER WHERE IDSERVICIO=@IDSERVICIO
+                            IF @T_ESTABILIDAD<@DURACION
+                            BEGIN
+                               SELECT @CANTIDADT=CEILING(@DURACION/@T_ESTABILIDAD)* @CANTDOSIS*@VECES_EN_T
+                            END 
+                            ELSE
+                            BEGIN  
+                               SELECT @CANTIDADT=@CANTDOSIS*@VECES_EN_T
+                            END
+                            PRINT 'ANTES DEL INSERT'
+                            PRINT '@VECES_EN_T == '+LTRIM(RTRIM(STR(@VECES_EN_T)))
+                            PRINT '@CANTDOSIS == '+LTRIM(RTRIM(STR(@CANTDOSIS)))
+                            PRINT '@CANTIDADT == '+LTRIM(RTRIM(STR(@CANTIDADT)))
+                            PRINT 'HORAS =='+LTRIM(RTRIM(STR(@DURACION)))
+                            PRINT '@QTOTDOSIS =='+LTRIM(RTRIM(STR(@QTOTDOSIS)))
+                            PRINT '@EQUICC =='+LTRIM(RTRIM(STR(@EQUICC)))
+                            PRINT '@CODOM == '+@CODOM
+                            PRINT '@DURACION == '+LTRIM(RTRIM(STR(@DURACION)))
+                            IF COALESCE(@DURACION,24)<=@T_ESTABILIDAD
+                            BEGIN
+                               PRINT '@DURACION<=@T_ESTABILIDAD'
+                               IF @QTOTDOSIS<=@EQUICC
+                               BEGIN 
+                                  SELECT @CANTIDADT=1
+                               END
+                               ELSE
+                               BEGIN
+                                  PRINT 'INGRESO POR EL ELSE'
+                                  IF @CODOM=DBO.FNK_VALORVARIABLE('OMCODLIQUIDOSPARE')
+                                  BEGIN
+                                      PRINT 'ES UN LIQUIDO DE BASE'
+                                      SELECT @CANTIDADT=(@QTOTDOSIS/@EQUICC)
+                                  END
+                                  ELSE
+                                  BEGIN
+                                     IF @CANTIDADT>@EQUICC
+                                     BEGIN
+                                        SELECT @CANTIDADT=(@QTOTDOSIS/@EQUICC)
+                                     END
+                                  END
+                               END
+                            END
+                            SELECT @CANTIDADT=CEILING(@CANTIDADT/1)
+                            INSERT INTO IZSOLD (CNSIZSOLD , CNSIZSOL , IDARTICULO , CANTIDADSOL , ESTADO, CODOM, CANTIDAD, FRECUENCIA, NUMDOSIS,
+                                                CANTIDADBOLO, QIMPREGNACION, DURACION, IDSERVICIO,CNSHBALI)
+                            SELECT @CNSIZSOLD, @CNSIZSOL, SER.IDARTICULO,@CANTIDADT,1, @CODOM, @CANTIDAD, @FRECUENCIA, CASE WHEN @VEZ=1 THEN @VEZ ELSE @VEZ-1 END,
+                                   0, @QIMPSERVICIO, @DURACION, @IDSERVICIO,@CNSHBALI
+                            FROM   SER
+                            WHERE  IDSERVICIO = @IDSERVICIO 
+                         END
+                         ELSE
+                         BEGIN
+                            PRINT 'ESTABILIDAD MAYOR A LA DURACION... '
+                            PRINT '@T_ESTABILIDAD='+LTRIM(RTRIM(STR(@T_ESTABILIDAD)))+' @FRECUENCIA '+LTRIM(RTRIM(STR(@FRECUENCIA))) 
+                            SELECT @VECES_EN_T=(@DURACION/@FRECUENCIA) 
+                            SELECT @CANTDOSIS=(@CANTIDAD/CASE WHEN COALESCE(SER.EQUICC,0)<=0 THEN 1 ELSE SER.EQUICC END) FROM SER WHERE IDSERVICIO=@IDSERVICIO
+                           -- SELECT @CANTIDADT=CEILING(@CANTDOSIS/1)*@VECES_EN_T
+
+                            PRINT 'NUEVO PROCESO PARA GUARDAR EL SOBRANTE T_ESTABILIDAD MAYOR A 24 HORAS'
+
+                            SELECT @PEDIR=0
+
+                            IF @QTOTDOSIS<=@EQUICC
+                            BEGIN
+                               IF (SELECT COUNT(*) FROM HDUXS WHERE NOADMISION=@NOADMISION AND IDSERVICIO=@IDSERVICIO AND FFINESTAB>@FECHAHC AND COALESCE(CCSOBRANTE,0)>0)>0
+                               BEGIN 
+                                  PRINT 'YA ESTA EN HDUXS'--SELECT TOP 1 * FROM HDUXS
+                                  SELECT @CNSHDUXS=CNSHDUXS,@SOBRANTE=CCSOBRANTE  FROM HDUXS WHERE NOADMISION=@NOADMISION AND IDSERVICIO=@IDSERVICIO AND  FFINESTAB>@FECHAHC AND COALESCE(CCSOBRANTE,0)>0
+
+                                  PRINT 'REVISO SI LO QUE TENGO ME ALCANZA PARA CUMPLIR LA ORDEN '
+                                  IF @QTOTDOSIS>@SOBRANTE
+                                  BEGIN
+                                     SELECT @PEDIR=1
+                                     UPDATE HDUXS SET CCSOBRANTE=0 WHERE CNSHDUXS=@CNSHDUXS  
+
+                                     EXEC SPK_GENCONSECUTIVO '01',@IDSEDE,'@HDUXS', @NUEVOHDUXS OUTPUT  
+                                     SELECT @NUEVOHDUXS = @IDSEDE +  REPLACE(SPACE(10 - LEN(@NUEVOHDUXS))+LTRIM(RTRIM(@NUEVOHDUXS)),SPACE(1),0) 
+
+                                     INSERT INTO HDUXS(CNSHDUXS,HABCAMA,NOADMISION,IDSERVICIO,CCTOTAL,CCORDENADA,CCAPLICADA,CCSOBRANTE,CONSECUTIVOHCA,CODOM,ITEMRED,TIPOHISTORIA,FFINESTAB)
+                                     SELECT @NUEVOHDUXS,@HABCAMA,@NOADMISION,@IDSERVICIO,@EQUICC,@CANTIDAD,0,@EQUICC,@CONSECUTIVOHCA,@CODOM,1,'H',DATEADD(HH,@T_ESTABILIDAD,@FECHAHC)
+                                     
+                                     PRINT 'DESCONTAMOS LO QUE SE VA A ENTREGAR'
+
+                                     UPDATE HDUXS SET CCSOBRANTE=CCSOBRANTE-(@QTOTDOSIS-@SOBRANTE) WHERE CNSHDUXS=@NUEVOHDUXS
+
+                                     SELECT @CANTIDADT =1
+                                  END
+                                  ELSE
+                                  BEGIN
+                                     PRINT 'ALCANZA LO QUE SOBRO ANTERIOR'
+                                     SELECT @PEDIR=0
+                                     UPDATE HDUXS SET CCSOBRANTE=CCSOBRANTE-(@QTOTDOSIS-@SOBRANTE) WHERE CNSHDUXS=@CNSHDUXS
+                                  END
+                               END
+                               ELSE
+                               BEGIN
+                                  PRINT 'NO  ESTA EN HDUXS'
+                                  SELECT @PEDIR=1                                  
+                                  EXEC SPK_GENCONSECUTIVO '01',@IDSEDE,'@HDUXS', @NUEVOHDUXS OUTPUT  
+                                  SELECT @NUEVOHDUXS = @IDSEDE +  REPLACE(SPACE(10 - LEN(@NUEVOHDUXS))+LTRIM(RTRIM(@NUEVOHDUXS)),SPACE(1),0) 
+                                                                                
+                                  INSERT INTO HDUXS(CNSHDUXS,HABCAMA,NOADMISION,IDSERVICIO,CCTOTAL,CCORDENADA,CCAPLICADA,CCSOBRANTE,CONSECUTIVOHCA,CODOM,ITEMRED,TIPOHISTORIA,FFINESTAB)
+                                  SELECT @NUEVOHDUXS,@HABCAMA,@NOADMISION,@IDSERVICIO,@EQUICC,@CANTIDAD,0,@EQUICC,@CONSECUTIVOHCA,@CODOM,1,'H',DATEADD(HH,@T_ESTABILIDAD,@FECHAHC)
+                                      
+                                  PRINT 'DESCONTAMOS LO QUE SE VA A ENTREGAR'
+                                    
+                                  UPDATE HDUXS SET CCSOBRANTE=CCSOBRANTE-@QTOTDOSIS WHERE CNSHDUXS=@NUEVOHDUXS
+
+                                  SELECT @CANTIDADT =1
+                               END
+                            END
+                            ELSE
+                            BEGIN
+                               PRINT 'LA @QTOTDOSIS > @EQUICC'
+                               PRINT 'REVISO SI EXISTE.....'
+                               IF (SELECT COUNT(*) FROM HDUXS WHERE NOADMISION=@NOADMISION AND IDSERVICIO=@IDSERVICIO AND FFINESTAB>@FECHAHC AND COALESCE(CCSOBRANTE,0)>0)>0
+                               BEGIN 
+                                  PRINT 'YA ESTA EN HDUXS'--SELECT TOP 1 * FROM HDUXS
+                                  SELECT @CNSHDUXS=CNSHDUXS,@SOBRANTE=CCSOBRANTE  FROM HDUXS WHERE NOADMISION=@NOADMISION AND IDSERVICIO=@IDSERVICIO AND  FFINESTAB>@FECHAHC AND COALESCE(CCSOBRANTE,0)>0
+
+                                  SELECT @NUWTDOSIS=@QTOTDOSIS-@SOBRANTE
+
+                                  IF @NUWTDOSIS<=@EQUICC
+                                  BEGIN
+                                     PRINT 'CON UNO SOLO ALCANZA'
+                                     SELECT @PEDIR=1
+                                     UPDATE HDUXS SET CCSOBRANTE=0 WHERE CNSHDUXS=@CNSHDUXS  
+
+                                     EXEC SPK_GENCONSECUTIVO '01',@IDSEDE,'@HDUXS', @NUEVOHDUXS OUTPUT  
+                                     SELECT @NUEVOHDUXS = @IDSEDE +  REPLACE(SPACE(10 - LEN(@NUEVOHDUXS))+LTRIM(RTRIM(@NUEVOHDUXS)),SPACE(1),0) 
+
+                                     INSERT INTO HDUXS(CNSHDUXS,HABCAMA,NOADMISION,IDSERVICIO,CCTOTAL,CCORDENADA,CCAPLICADA,CCSOBRANTE,CONSECUTIVOHCA,CODOM,ITEMRED,TIPOHISTORIA,FFINESTAB)
+                                     SELECT @NUEVOHDUXS,@HABCAMA,@NOADMISION,@IDSERVICIO,@EQUICC,@CANTIDAD,0,@EQUICC,@CONSECUTIVOHCA,@CODOM,1,'H',DATEADD(HH,@T_ESTABILIDAD,GETDATE())
+                                     
+                                     PRINT 'DESCONTAMOS LO QUE SE VA A ENTREGAR'
+
+                                     UPDATE HDUXS SET CCSOBRANTE=CCSOBRANTE-@NUWTDOSIS WHERE CNSHDUXS=@NUEVOHDUXS
+
+                                     SELECT @CANTIDADT =1
+                                  END
+                                  ELSE
+                                  BEGIN
+                                     PRINT'REVISO CUANTOS ME HACEN FALTA'
+                                     SELECT @SOBRANTEN=(CEILING(@NUWTDOSIS/@EQUICC)*@EQUICC)-@NUWTDOSIS
+                                     SELECT @PEDIR=1
+                                     IF COALESCE(@SOBRANTE,0)>0
+                                     BEGIN
+                                        PRINT' SOBRA DEBO HACER EL INSERT'
+                                        SELECT @PEDIR=1
+                                        UPDATE HDUXS SET CCSOBRANTE=0 WHERE CNSHDUXS=@CNSHDUXS  
+
+                                        EXEC SPK_GENCONSECUTIVO '01',@IDSEDE,'@HDUXS', @NUEVOHDUXS OUTPUT  
+                                        SELECT @NUEVOHDUXS = @IDSEDE +  REPLACE(SPACE(10 - LEN(@NUEVOHDUXS))+LTRIM(RTRIM(@NUEVOHDUXS)),SPACE(1),0) 
+
+                                        INSERT INTO HDUXS(CNSHDUXS,HABCAMA,NOADMISION,IDSERVICIO,CCTOTAL,CCORDENADA,CCAPLICADA,CCSOBRANTE,CONSECUTIVOHCA,CODOM,ITEMRED,TIPOHISTORIA,FFINESTAB)
+                                        SELECT @NUEVOHDUXS,@HABCAMA,@NOADMISION,@IDSERVICIO,@EQUICC,@CANTIDAD,0,@EQUICC,@CONSECUTIVOHCA,@CODOM,1,'H',DATEADD(HH,@T_ESTABILIDAD,GETDATE())
+
+                                        UPDATE HDUXS SET CCSOBRANTE=@SOBRANTEN WHERE CNSHDUXS=@NUEVOHDUXS
+                                     END
+                                     SELECT @CANTIDADT =(CEILING(@NUWTDOSIS/@EQUICC))
+                                  END
+                               END
+                               ELSE
+                               BEGIN
+                                  PRINT 'NO EXISTE EN HDUXS'
+                                  SELECT @SOBRANTEN=(CEILING(@QTOTDOSIS/@EQUICC)*@EQUICC)-@QTOTDOSIS
+                                  SELECT @PEDIR=1
+                                  IF COALESCE(@SOBRANTE,0)>0
+                                  BEGIN
+                                     PRINT' SOBRA DEBO HACER EL INSERT'
+                                     UPDATE HDUXS SET CCSOBRANTE=0 WHERE CNSHDUXS=@CNSHDUXS  
+                                       
+                                     EXEC SPK_GENCONSECUTIVO '01',@IDSEDE,'@HDUXS', @NUEVOHDUXS OUTPUT  
+                                     SELECT @NUEVOHDUXS = @IDSEDE +  REPLACE(SPACE(10 - LEN(@NUEVOHDUXS))+LTRIM(RTRIM(@NUEVOHDUXS)),SPACE(1),0) 
+                                       
+                                     INSERT INTO HDUXS(CNSHDUXS,HABCAMA,NOADMISION,IDSERVICIO,CCTOTAL,CCORDENADA,CCAPLICADA,CCSOBRANTE,CONSECUTIVOHCA,CODOM,ITEMRED,TIPOHISTORIA,FFINESTAB)
+                                     SELECT @NUEVOHDUXS,@HABCAMA,@NOADMISION,@IDSERVICIO,@EQUICC,@CANTIDAD,0,@EQUICC,@CONSECUTIVOHCA,@CODOM,1,'H',DATEADD(HH,@T_ESTABILIDAD,GETDATE())
+                                       
+                                     UPDATE HDUXS SET CCSOBRANTE=@SOBRANTEN WHERE CNSHDUXS=@NUEVOHDUXS
+                                  END
+                                  SELECT @CANTIDADT =(CEILING(@QTOTDOSIS/@EQUICC))
+                               END
+                            END
+                            IF COALESCE(@PEDIR,0)=1
+                            BEGIN
+                               PRINT 'LO QUE VOY A PEDIR'+LTRIM(RTRIM(STR(@CANTIDADT)))
+                               INSERT INTO IZSOLD (CNSIZSOLD , CNSIZSOL , IDARTICULO , CANTIDADSOL , ESTADO, CODOM, CANTIDAD, FRECUENCIA, NUMDOSIS,
+                                                   CANTIDADBOLO, QIMPREGNACION, DURACION, IDSERVICIO,CNSHBALI)
+                               SELECT @CNSIZSOLD, @CNSIZSOL, SER.IDARTICULO,@CANTIDADT,1, @CODOM, @CANTIDAD, @FRECUENCIA, CASE WHEN @VEZ=1 THEN @VEZ ELSE @VEZ-1 END,
+                                      0, @QIMPSERVICIO, @DURACION, @IDSERVICIO,@CNSHBALI
+                               FROM   SER
+                               WHERE  IDSERVICIO = @IDSERVICIO
+                            END                             
+                         END 
+                      END
+                   END
+                END
+             END
+             ELSE
+             BEGIN
+                INSERT INTO IZSOLD (CNSIZSOLD , CNSIZSOL , IDARTICULO , CANTIDADSOL , ESTADO, CODOM, CANTIDAD, FRECUENCIA, NUMDOSIS,
+                                    CANTIDADBOLO, QIMPREGNACION, DURACION, IDSERVICIO,CNSHBALI)
+                SELECT @CNSIZSOLD, @CNSIZSOL, SER.IDARTICULO, CASE COALESCE(SER.MDOSIF,0) WHEN 1 THEN CEILING(@QTOTDOSIS/SER.EQUICC) ELSE @QTOTDOSIS END, 
+                       1, @CODOM, @CANTIDAD, @FRECUENCIA, CASE WHEN @VEZ=1 THEN @VEZ ELSE @VEZ-1 END, 0, @QIMPSERVICIO,@DURACION, @IDSERVICIO,@CNSHBALI
+                FROM   SER
+                WHERE  IDSERVICIO = @IDSERVICIO
+            END
+         END
+         PRINT 'VOY POR LOS DILUYENTES '+' @IDSERVICIOMEZCLA '+@IDSERVICIOMEZCLA+' @QTOTMEZCLA '+LTRIM(RTRIM(STR(@QTOTMEZCLA)))+' @INFUSION '+LTRIM(RTRIM(STR(@INFUSION)))
+         IF (COALESCE(@IDSERVICIOMEZCLA,'') <> '' AND COALESCE(@QTOTMEZCLA,0) > 0) OR COALESCE(@INFUSION,0) = 1
+         BEGIN
+             SELECT @CNSIZSOLD = ''
+             SELECT @CANTIDADEF=0
+             EXEC SPK_GENCONSECUTIVO '01',@IDSEDE,'@IZSOLD', @CNSIZSOLD OUTPUT  
+             SELECT @CNSIZSOLD = @IDSEDE + REPLACE(SPACE(10 - LEN(@CNSIZSOLD))+LTRIM(RTRIM(@CNSIZSOLD)),SPACE(1),0) 
+             SELECT @JERARQUIA=IDJERARQUIA  FROM SER WHERE IDSERVICIO=@IDSERVICIOMEZCLA
+             IF  @INFUSION = 1 
+             BEGIN
+                IF COALESCE(@QTOTMEZCLA,0)>0
+                BEGIN
+                   PRINT 'DILUYENTE INFUCION'
+                   PRINT '@JERARQUIA =='+@JERARQUIA
+                   PRINT '@QTOTMEZCLA =='+LTRIM(RTRIM(STR(@QTOTMEZCLA)))
+                   IF (SELECT MAX(EQUICC) FROM SER WHERE IDJERARQUIA=@JERARQUIA)<=@QTOTMEZCLA
+                   BEGIN 
+                      SELECT TOP 1 @IDSERVICIODEF= IDSERVICIO FROM SER WHERE IDJERARQUIA=@JERARQUIA   ORDER BY EQUICC DESC
+                   END
+                   ELSE
+                   BEGIN
+                      SELECT TOP 1 @IDSERVICIODEF= IDSERVICIO FROM SER WHERE IDJERARQUIA=@JERARQUIA  AND COALESCE(EQUICC,0)>=@QTOTMEZCLA  ORDER BY EQUICC ASC
+                   END
+                   PRINT '@IDSERVICIODEF ==' +@IDSERVICIODEF
+                   SELECT @CANTIDADEF=CEILING(@QTOTMEZCLA/EQUICC) FROM SER WHERE IDSERVICIO= @IDSERVICIODEF
+                   PRINT '@CANTIDADEF == '+LTRIM(RTRIM(STR(@CANTIDADEF)))
+                   INSERT INTO IZSOLD (CNSIZSOLD , CNSIZSOL , IDARTICULO , CANTIDADSOL , ESTADO, CODOM,CANTIDAD,FRECUENCIA,NUMDOSIS,CANTIDADBOLO,
+                                       QIMPREGNACION,DURACION,IDSERVICIO,CNSHBALI)
+                   SELECT @CNSIZSOLD, @CNSIZSOL,IDARTICULO, @CANTIDADEF,  1, @CODOM,@QMEZCLA,@FRECUENCIA,CASE WHEN @VEZ=1 THEN @VEZ ELSE @VEZ-1 END,@CANTIDADBOLO,
+                          @QIMPSERVICIO,24,IDSERVICIO,@CNSHBALI
+                   FROM SER WHERE IDSERVICIO=@IDSERVICIODEF
+                END
+             END
+             ELSE
+             BEGIN
+                SELECT TOP 1 @IDSERVICIODEF= IDSERVICIO FROM SER WHERE IDJERARQUIA=@JERARQUIA  AND COALESCE(EQUICC,0)>=@QMEZCLA  ORDER BY EQUICC             
+                SELECT @CANTIDADEF=CASE WHEN @VEZ=1 THEN @VEZ ELSE @VEZ-1 END
+                INSERT INTO IZSOLD (CNSIZSOLD , CNSIZSOL , IDARTICULO , CANTIDADSOL , ESTADO, CODOM,CANTIDAD,FRECUENCIA,NUMDOSIS,CANTIDADBOLO,
+                                    QIMPREGNACION,DURACION,IDSERVICIO,CNSHBALI)
+                SELECT @CNSIZSOLD, @CNSIZSOL,IDARTICULO, @CANTIDADEF,  1, @CODOM,@QMEZCLA,@FRECUENCIA,CASE WHEN @VEZ=1 THEN @VEZ ELSE @VEZ-1 END,@CANTIDADBOLO,
+                       @QIMPSERVICIO,24,IDSERVICIO,@CNSHBALI
+                FROM SER WHERE IDSERVICIO=@IDSERVICIODEF
+             END
+
+         END
+         PRINT 'SALGO DEL WHILE '
+         FETCH NEXT FROM SER_C
+         INTO @IDSERVICIO, @CANTIDAD, @FRECUENCIA, @CLASEHTX, @CODOM, @FECHAULTHHOM, @IDSERVICIOMEZCLA, @QMEZCLA,
+              @QIMPSERVICIO, @QIMPMEZCLA, @DURACIONIMP, @RAZONNEC, @HORAAM, @QAM, @HORAPM, @QPM, @GOTEO,@DURACION
+      END
+
+      CLOSE SER_C
+      DEALLOCATE SER_C
+      --PRINT 'VOY A LA SIGUIENTE ADMISION'
+      FETCH NEXT FROM H_C
+      INTO @HABCAMA, @SECTOR, @NOADMISION, @IDSEDEHAB
+      --PRINT 'NUEVA ADMISION = '+@NOADMISION
+   END
+   CLOSE H_C
+   DEALLOCATE H_C
+END

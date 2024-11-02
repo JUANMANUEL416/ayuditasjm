@@ -1,0 +1,35 @@
+Finalmente logre hayar una solucion, ya apareció todo lo que se habia
+desaparecido, la conclusión es que alguna vez abri algun archivo cno macros
+que deshabilitaron los menus.
+
+La solucion es la siguiente:
+
+1. <Alt F11> - para ir al editor de Visual Basic
+2. <Ctrl G> - Abre la ventana "Inmediato"
+3. Copiar "Application.CommandBars("Cell").enabled = true" y dar enter, y
+ahi se habilita el menú del boton derecho en las celdas
+4. Cambiar "Cell" por "row" y "column" y se habilita nuevamente en filas y
+columnas.
+
+Otra solucion hayada es:
+
+en el editor de visual basic escibir la siguiete rutina y ejecutarla:
+
+Sub Enable_All_Right_Click_Menus()
+'This will enable all BuiltIn Command bars
+Dim Cbar As CommandBar
+For Each Cbar In Application.CommandBars
+Cbar.Enabled = True
+Next
+End Sub
+
+Pueden encontrar más información en:
+http://www.eggheadcafe.com/software/aspnet/29685542/cannot-rightclick-a-shor.aspx
+http://foros.emagister.com/tema-bot_f3n+derecho+del+raton+en+excel-12890-307261.htm
+
+
+Espero le sea util a alguuien nuevamente esta información.
+
+Saludos, Carlos Córdoba
+- mostrar texto citado -
+

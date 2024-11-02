@@ -1,0 +1,10 @@
+clear(ususu:record)
+ususu:usuario =  FTR:USUARIOFACTURA
+if access:ususu.tryfetch(USUSU:USUSUUSU) then clear(ususu:record).
+W# = FnValorVariable('ASI_FIRMA_HC_ANCHO')
+H# = FnValorVariable('ASI_FIRMA_HC_ALTO')
+Arc:id = USUSU:IDFIRMA
+access:archivos.fetch(Arc:PK_Archivos)
+Report$?Firma{PROP:ImageBlob} = Arc:dicom{PROP:Handle}
+Report$?Firma{PROP:Width}   = W# * 400
+Report$?Firma{PROP:Height}  = H# * 400

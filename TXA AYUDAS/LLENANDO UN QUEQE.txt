@@ -1,0 +1,43 @@
+  CLEAR(WDUM:RECORD)
+  wdum{prop:sql} = loc:sql
+  IF ERRORCODE() THEN
+     SETCLIPBOARD(LOC:SQL)
+     MESSAGE('Error: ' & FILEERROR(), 'Error Krystalos', ICON:HAND)
+  ELSE
+     !SETCLIPBOARD(wdum{prop:sql})
+     FREE(QPT)
+     LOOP UNTIL ACCESS:WDUM.NEXT()
+         QPT:IDTERCERO   = WDU:C1
+         QPT:RAZONSOCIAL = WDU:C2
+         QPT:PORVENCER   = WDU:C3
+         QPT:DM0_30      = WDU:C4
+         QPT:DM31_60     = WDU:C5
+         QPT:DM61_90     = WDU:C6
+         QPT:DM91_120    = WDU:C7
+         QPT:DM121_150   = WDU:C8
+         QPT:DM151_180   = WDU:C9
+         QPT:DM181_360   = WDU:C10
+         QPT:DM361_MAS   = WDU:C11
+         !IF FNVALORVARIABLE('IDTIPOCXP_DEFAULT') = 'ARS'
+           WDU2{prop:sql} = 'SELECT IDCONTRATOIPS FROM RADD WHERE CNSFCXP=''' & CLIP(WDU:C12) & ''''
+           ACCESS:WDU2.NEXT()
+           QPT:CNTIPS = CLIP(WDU2:C1)
+         !END
+         ADD(QPT)
+     END
+  END
+  
+  -- MARCAR Y DESMARCAR
+  if keycode() = MouseLeft2
+f# =?List3{prop:selected}
+get( queservicios,f#)
+if not errorcode()
+ if qser:mark ='x'
+ qser:mark =''
+ else
+ qser:mark ='x'
+ end
+ put(queservicios)
+end
+display
+end

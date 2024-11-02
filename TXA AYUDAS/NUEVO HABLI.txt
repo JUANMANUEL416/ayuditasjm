@@ -1,0 +1,14 @@
+
+                  loc:sql = 'EXEC SPK_APLICA_HOJA '&FNSQLFMT(HBALID:CNSHBALI)&', 6, '&fnsqlfmt(glo:usuario)&', '&|
+                                                   HBALID:NTIPO&', '&HBALID:NCONSECUTIVO&', '&LOC:MODOAPLI&', '&fnsqlfmt(loc:claseanula)&', ''NORMAL'''
+                  CLEAR(WDUM:RECORD)
+                  WDUM{PROP:SQL} = LOC:SQL
+						
+						(string,short,short,short,string)
+						--Win:AplicarMedEnf(HBALID:CNSHBALI,6,HBALID:NTIPO,HBALID:NCONSECUTIVO,LOC:MODOAPLI)
+						
+						
+						!LOC:SQL=' EXEC SPK_GENENTREGA_ENF '&FNSQLFMT(IMOV:CNSMOV)&', '&FNSQLFMT(IZSOL:NOADMISION)&' , '&FNSQLFMT(GLO:IDSEDE)
+						
+						
+						loc:filtro = ' EXISTS (SELECT * FROM FNK_MOVIMIENTOSADMISION ('&FNSQLFMT(loc:noadmision)&') FN WHERE FN.CNSMOV=A.CNSMOV)'

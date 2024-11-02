@@ -1,0 +1,266 @@
+--RESUME DE TODO
+
+RUTA
+LOC:RUTAF = GetIni('RUTA','rutaExpor','','.\Krystalosx.ini')
+
+INICIAR 
+A.Init(QuickWindow,?SMExcel,1,1,1)
+
+ABRIR
+ MSExcel1.OpenFile(loc:rutaf & 'AUT_SER.xlsx')
+ 
+ GUARDAR
+  MSExcel1.Save(loc:rutaf & 'AUT_SER_' & '_' & loc:afi_documento & '_' & format(today(),@d12) & '_' & format(clock(),@t2)  &'.xlsx')
+
+UNHIDE(?LOC:MS)
+UNHIDE(?LOC:MS1)
+LOC:SQL=' SELECT A.CNSFACJ,CHAR(39)+A.N_RECIBO,CHAR(39)+A.CODCAJA,DBO.FNK_FECHA(A.FECHA),A.CLASE_FAC,CASE A.CERRADA WHEN 1 THEN ''SI'' ELSE ''NO'' END, '&CHR(13)&|
+        ' CASE A.ESTADO WHEN ''P'' THEN ''Activo'' WHEN ''D'' THEN ''Desechado'' ELSE ''Anulado'' END, CHAR(39)+A.IDAFILIADO,'&CHR(13)&|
+        ' CHAR(39)+A.IDTERCERO,CASE WHEN COALESCE(A.IDTERCERO,'''')<>'''' THEN D.RAZONSOCIAL ELSE ''''END,                               '&CHR(13)&|
+        ' CHAR(39)+B.NROCOMPROBANTE,CHAR(39)+B.NOREFERENCIA,B.TOTALDEBITO,B.TOTALCREDITO,                                             '&CHR(13)&|
+        ' CASE B.ESTADO WHEN 1 THEN ''PREPARADO'' WHEN 2 THEN ''CONTABILIZADA'' ELSE ''CON ERROR'' END,'&CHR(13)&|
+        ' CASE WHEN COALESCE(B.ANULADO,0)=1 THEN ''Anulado'' ELSE ''OK'' END,A.CODCAJA,A.NROCOMPROBANTE                  '&CHR(13)&|
+        ' FROM FCJ A LEFT JOIN MCP B ON A.NROCOMPROBANTE=B.NROCOMPROBANTE                            '&CHR(13)&|
+        ' LEFT JOIN TER D ON A.IDTERCERO=D.IDTERCERO                                      '&CHR(13)
+
+IF LOC:FILTRO<>'' THEN
+   LOC:sQL=CLIP(LOC:SQL)&' WHERE '&CLIP(LOC:FILTRO)
+END
+
+! MSExcel10.OpenFile(loc:rutaf & 'BASE.xls')
+ MSExcel10.CreateFile()
+ MSExcel10.Select('C3')
+ MSExcel10.Assign('Seguimiento de Caja Vs Contabilidad')
+ MSExcel10.SetAlignment(10)
+O#=0
+I#=6
+J#=0
+CLEAR(WDUM:RECORD,-1)
+IF FNVALORVARIABLE('IDDEPURAR')='SI' AND GLO:GRUPO='PPAL'
+   SETCLIPBOARD(LOC:SQL)
+   STOP('REVISANDO')
+END
+WDUM{PROP:SQL}=LOC:SQL
+LOOP UNTIL ACCESS:WDUM.NEXT()
+
+     MSExcel10.Assign(I#, 3, 'CNSFACJ')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 4, 'NRO RECIBO')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 5, 'CODCAJA')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 6, 'FECHA')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 7, 'CLASE')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 8, 'CERRADA')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 9, 'ESTADO')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 10, 'IDAFILIADO')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 11, 'IDTERCERO')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 12, 'RAZON SOCIAL')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 13, 'NROCOMPROBANTE')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 14, 'NOREFERENCIA')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 15, 'TOTAL DEBITO')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 16, 'TOTAL CERDITO')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 17, 'ESTADO')
+     MSExcel10.setbold(true)
+     MSExcel10.Assign(I#, 18, 'ANULADO')
+     MSExcel10.setbold(true)
+     I#=I#+1
+     MSExcel10.Assign(I#, 3, ''''& WDU:C1)
+     MSExcel10.Assign(I#, 4,  WDU:C2)
+     MSExcel10.Assign(I#, 5,  WDU:C3)
+     MSExcel10.Assign(I#, 6,  WDU:C4)
+     MSExcel10.Assign(I#, 7,  WDU:C5)
+     MSExcel10.Assign(I#, 8,  WDU:C6)
+     MSExcel10.Assign(I#, 9,  WDU:C7)
+     MSExcel10.Assign(I#, 10, WDU:C8)
+     MSExcel10.Assign(I#, 11, WDU:C9)
+     MSExcel10.Assign(I#, 12, WDU:C10)
+     MSExcel10.Assign(I#, 13, WDU:C11)
+     MSExcel10.Assign(I#, 14, WDU:C12)
+     MSExcel10.Assign(I#, 15, WDU:C13)
+     MSExcel10.Assign(I#, 16, WDU:C14)
+     MSExcel10.Assign(I#, 17, WDU:C15)
+     MSExcel10.Assign(I#, 18, WDU:C16)
+    
+
+     LOC:SQL1=' SELECT A.CONCEPTO,B.DESCRIPCION,A.CANTIDAD,A.VALORUNITARIO,A.VALORTOTAL,A.VLRDESCUENTO '&CHR(13)&|
+              ' FROM FCJD A INNER JOIN CPCJ B ON A.CONCEPTO=B.CODIGO                                   '&CHR(13)&|
+              ' WHERE A.CODCAJA='&FNSQLFMT(WDU:C17)&' AND CNSFACJ='&FNSQLFMT(WDU:C1)
+     I#=I#+1
+     L#=I#
+     IF FNVALORVARIABLE('IDDEPURAR')='SI' AND GLO:GRUPO='PPAL' THEN
+        SETCLIPBOARD(LOC:SQL1)
+        STOP('SQL REVISA')
+     END
+         MSExcel10.Assign(I#, 5,  'CONCEPTO')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(I#, 6,  'DESCRIPCION')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(I#, 7,  'CANT')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(I#, 8,  'VLR UNI')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(I#, 9,  'VLR TOTAL')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(I#, 10, 'DESCUENTO')
+         MSExcel10.setbold(true)
+     I#=I#+1
+     WDU2{PROP:SQL}=LOC:SQL1
+     LOOP UNTIL ACCESS:WDU2.NEXT()
+         MSExcel10.Assign(I#, 5,  WDU2:C1)
+         MSExcel10.Assign(I#, 6,  WDU2:C2)
+         MSExcel10.Assign(I#, 7,  WDU2:C3)
+         MSExcel10.Assign(I#, 8,  WDU2:C4)
+         MSExcel10.SetNumberFormat(J#, 8,' #,##0.00')
+         MSExcel10.Assign(I#, 9,  WDU2:C5)
+         MSExcel10.SetNumberFormat(J#, 9,' #,##0.00')
+         MSExcel10.Assign(I#, 10, WDU2:C6)
+         I#+=1
+         IF O#=0 THEN
+            LOC:MS='EXPORTANDO DATOS.'
+            LOC:MS1='* *'
+            O#=1
+         ELSIF O#=1 THEN
+            LOC:MS='EXPORTANDO DATOS. .'
+            LOC:MS1=' / '
+            O#=2
+         ELSIF O#=2 THEN
+            LOC:MS='EXPORTANDO DATOS. . .'
+            LOC:MS1='* * *'
+            O#=3
+         ELSIF O#=3 THEN
+            LOC:MS='EXPORTANDO DATOS. . .'
+            LOC:MS1=' / / '
+            O#=4
+         ELSIF O#=4 THEN
+            LOC:MS='EXPORTANDO DATOS. . . .'
+            LOC:MS1='* * * *'
+            O#=0
+         END
+         DISPLAY
+     END
+     LOC:SQL3=' SELECT A.TIPOPAGO,B.DESCRIPCION,A.VALOR,A.BANCO,C.DESCRIPCION,A.SUCURSAL,A.CTA_BCO '&CHR(13)&|
+              ' FROM PCJ A INNER JOIN FPA B ON A.TIPOPAGO=B.FORMAPAGO                      '&CHR(13)&|
+              '            LEFT JOIN  BCO C ON A.BANCO=C.BANCO                             '&CHR(13)&|
+              ' WHERE A.CODCAJA='&FNSQLFMT(WDU:C17)&'  AND  A.CNSFACJ='&FNSQLFMT(WDU:C1)
+     I#=I#+1
+     IF FNVALORVARIABLE('IDDEPURAR')='SI' AND GLO:GRUPO='PPAL'
+        SETCLIPBOARD(LOC:SQL3)
+        STOP('REVISANDO3')
+     END
+         MSExcel10.Assign(I#, 5,  'FORMA')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(I#, 6,  'DESCRIPCION')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(I#, 7,  'VALOR')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(I#, 8,  'BANCO')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(I#, 9,  'N_BANCO')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(I#, 10, 'SUCURSAL')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(I#, 11, 'CUENTA No.')
+         MSExcel10.setbold(true)
+
+     WDU3{PROP:SQL}=LOC:SQL3
+     LOOP UNTIL ACCESS:WDU3.NEXT()
+         MSExcel10.Assign(I#, 5,  WDU3:C1)
+         MSExcel10.Assign(I#, 6,  WDU3:C2)
+         MSExcel10.Assign(I#, 7,  WDU3:C3)
+         MSExcel10.Assign(I#, 8,  WDU3:C4)
+         MSExcel10.Assign(I#, 9,  WDU3:C5)
+         MSExcel10.Assign(I#, 10, WDU3:C6)
+         MSExcel10.Assign(I#, 10, WDU3:C7)
+        I#+=1
+        IF O#=0 THEN
+           LOC:MS='EXPORTANDO DATOS.'
+           LOC:MS1='* *'
+           O#=1
+        ELSIF O#=1 THEN
+           LOC:MS='EXPORTANDO DATOS. .'
+           LOC:MS1=' / '
+           O#=2
+        ELSIF O#=2 THEN
+           LOC:MS='EXPORTANDO DATOS. . . '
+           LOC:MS1='* * *'
+           O#=3
+        ELSIF O#=3 THEN
+           LOC:MS='EXPORTANDO DATOS. . .'
+           LOC:MS1=' / / '
+           O#=4
+        ELSIF O#=4 THEN
+           LOC:MS='EXPORTANDO DATOS. . . .'
+           LOC:MS1='* * * *'
+           O#=0
+        END
+        DISPLAY
+     END
+     LOC:SQL4=' SELECT B.CUENTA,C.NOMCUENTA,B.TIPO,B.VALOR                        '&CHR(13)&|
+              ' FROM MCP A INNER JOIN MCH B ON A.NROCOMPROBANTE=B.NROCOMPROBANTE  '&CHR(13)&|
+              '            INNER JOIN CUE C ON B.CUENTA=C.CUENTA                  '&CHR(13)&|
+              ' WHERE A.NROCOMPROBANTE='&FNSQLFMT(WDU:C18)
+     
+     IF FNVALORVARIABLE('IDDEPURAR')='SI' AND GLO:GRUPO='PPAL'
+        SETCLIPBOARD(LOC:SQL4)
+        STOP('REVISANDO4')
+     END
+         MSExcel10.Assign(L#, 13,  'CUENTA')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(L#, 14,  'NOM_CUENTA')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(L#, 15,  'TIPO')
+         MSExcel10.setbold(true)
+         MSExcel10.Assign(L#, 16,  'VALOR')
+         MSExcel10.setbold(true)
+     L#=L#+1
+     WDU4{PROP:SQL}=LOC:SQL4
+     LOOP UNTIL ACCESS:WDU4.NEXT()
+         MSExcel10.Assign(L#, 13,  WDU4:C1)
+         MSExcel10.Assign(L#, 14,  WDU4:C2)
+         MSExcel10.Assign(L#, 15,  WDU4:C3)
+         MSExcel10.Assign(L#, 16,  WDU4:C4)
+         L#+=1
+        IF O#=0 THEN
+           LOC:MS='EXPORTANDO DATOS.'
+           LOC:MS1='* *'
+           O#=1
+        ELSIF O#=1 THEN
+           LOC:MS='EXPORTANDO DATOS. .'
+           LOC:MS1=' / '
+           O#=2
+        ELSIF O#=2 THEN
+           LOC:MS='EXPORTANDO DATOS. . .'
+           LOC:MS1='* * *'
+           O#=3
+        ELSIF O#=3 THEN
+           LOC:MS='EXPORTANDO DATOS. . . .'
+           LOC:MS1=' / / '
+           O#=4
+        ELSIF O#=4 THEN
+           LOC:MS='EXPORTANDO DATOS. . . . .'
+           LOC:MS1='* * * *'
+           O#=0
+        END
+        DISPLAY
+     END
+  IF L#>=I# THEN
+     I#=L#
+  END
+
+  I#+=1
+END
+HIDE(?LOC:MS)
+HIDE(?LOC:MS1)
+MESSAGE('Exportación Termindada')

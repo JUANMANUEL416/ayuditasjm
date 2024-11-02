@@ -1,0 +1,80 @@
+--encabezado
+         IMAGE,AT(94,52,969,781),USE(?LogoCliente),#ORIG(?Image1)
+         TEXT,AT(1094,42,3792,125),USE(DPR:RazonSocial),BOXED,FONT('Arial',8,,),RESIZE,#ORIG(DPR:RazonSocial)
+         STRING(@s20),AT(1104,177,1302,125),USE(GLO:PNit),TRN,#FREEZE,#ORIG(?String57)
+         STRING(@s60),AT(1104,292,4375,125),USE(GLO:DIRECCION),TRN,#FREEZE,#ORIG(?String57)
+         STRING(@s30),AT(1833,427,1927,125),USE(GLO:TELEFONOS),TRN,#FREEZE,#ORIG(?String57)
+         STRING('Teléfonos:'),AT(1104,427,531,125),USE(?String57),TRN,#ORIG(?String57)
+         STRING(@s30),AT(1104,552,1906,125),USE(GLO:CIUDAD),TRN,#FREEZE,#ORIG(?String57)
+
+
+
+
+
+
+
+ LOC:NOMUSUSARIO = ''
+ LOC:FECHA      = ''
+ LOC:FECHAVTO   = ''
+ clear(ftr:record)
+
+ ftr:n_factura = FCXCD:N_FACTURA
+ if access:ftr.tryfetch(FTR:FTRN_FACTURA) then clear(ftr:record).
+ IF FTR:MIVA
+    LOC:IVA = FTR:VR_TOTAL * (FTR:PIVA/100)
+ END
+ case FTR:PROCEDENCIA
+ OF 'FINANCIERO'
+    LOC:NOMUSUSARIO = FTR:OBSERVACION
+    LOC:FECHA       = FTR:F_FACTURA_DATE
+    LOC:TOTALCR     += FCXCD:VLRNOTACR
+    LOC:TOTALND     += FCXCD:VLRNOTADB
+    loc:totalcxc    += FCXCD:SALDO
+ ELSE
+    IF FTR:PROCEDENCIA = 'ARS'
+       LOC:SQL2 = 'SELECT DISTINCT CNT.IDALTERNA, CNT.TIPOCONTRATOARS FROM CNT, FTRD WHERE FTRD.N_FACTURA ='&FNSQLFMT(FTR:N_FACTURA)&|
+                  ' AND CNT.IDCONTRATO = FTRD.NOADMISION '
+       CLEAR(WDUM:RECORD)
+       WDUM{PROP:SQL} = LOC:SQL2
+       access:wdum.next()
+       loc:idalterna = wdu:c1
+       LOC:FECHA    = FTR:F_FACTURA_DATE
+       LOC:FECHAVTO = FTR:F_VENCE_DATE
+       if wdu:c2='Otro Si'
+        loc:NoOtroSi = ''
+        loc:NOContrato = ''
+        loc:dig  = ''
+        loc:con1 = 0
+        loop until loc:dig = '-' or loc:con1>=len(loc:idalterna)
+         loc:con1 += 1
+         loc:dig = sub(loc:idalterna,loc:con1,1)
+         if loc:dig<>'-' then  loc:NoContrato = clip(loc:NoContrato) & clip(loc:dig).
+        end
+        loop until loc:con1>=len(loc:idalterna)
+         loc:con1 += 1
+         loc:dig = sub(loc:idalterna,loc:con1,1)
+         loc:NoOtroSi = clip(loc:NoOtroSi) & clip(loc:dig)
+        end
+        loc:NoOtroSi = 'Otro Si: '&clip(loc:NoOtroSi)
+        LOC:NOMUSUSARIO = clip(loc:NOContrato)
+       else
+        LOC:NOMUSUSARIO = loc:idalterna
+        loc:NoOtroSi    = ''
+       end           
+    ELSE
+      CLEAR(AFI:RECORD)
+      AFI:IDAFILIADO = FTR:IDAFILIADO
+      IF ACCESS:AFI.TRYFETCH(AFI:AFIIDAFILIADO) THEN CLEAR(AFI:RECORD).
+      LOC:NOMUSUSARIO = CLIP(AFI:PAPELLIDO)&' '&CLIP(AFI:SAPELLIDO)&' '&CLIP(AFI:PNOMBRE)&' '&CLIP(AFI:SNOMBRE)
+      LOC:FECHAVTO    = FTR:F_FACTURA_DATE
+      LOC:FECHA       = ''
+    END
+    
+	Prueb@2008
+
+    LOC:TOTALCR     += FCXCD:VLRNOTACR
+    LOC:TOTALND     += FCXCD:VLRNOTADB
+    loc:totalcxc    += FCXCD:SALDO
+    loc:numfact     += 1
+ END
+

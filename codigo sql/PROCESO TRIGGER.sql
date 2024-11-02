@@ -1,0 +1,19 @@
+CREATE OR ALTER TRIGGER TR_IUD_NestingTest ON NestingTest
+FOR INSERT, UPDATE, DELETE
+AS
+DECLARE @Operation VARCHAR(15)
+ 
+IF EXISTS (SELECT 0 FROM inserted)
+BEGIN
+   IF EXISTS (SELECT 0 FROM deleted)
+   BEGIN 
+      SELECT @Operation = 'UPDATE'
+   END ELSE
+   BEGIN
+      SELECT @Operation = 'INSERT'
+   END
+END ELSE 
+BEGIN
+   SELECT @Operation = 'DELETE'
+END 
+PRINT @Operation

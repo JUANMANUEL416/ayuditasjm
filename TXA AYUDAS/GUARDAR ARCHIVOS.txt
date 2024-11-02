@@ -1,0 +1,64 @@
+--GUARDAR ARCHIVOS 
+IF LOC:RUTA <>'' THEN
+!TRAER SOLO EL NOMBRE DEL DOCUMENTO
+    LOC:SQL = 'SELECT dbo.FNK_SELECT_NOMB_ARCHI('&FNSQLFMT(LOC:RUTA)& ')'
+    CLEAR(WDUM:RECORD)
+    WDUM{PROP:SQL} = LOC:SQL
+    ACCESS:WDUM.NEXT()
+    KGUIASD:RUTA =  CLIP(KGUIASD:CNSGUIA)&'_'&CLIP(KGUIASD:ITEM)&'_'&WDUM:C1
+
+    COPY(CLIP(LOC:RUTA),CLIP(FNVALORVARIABLE('KGUIAS_PAT'))&CLIP(KGUIASD:RUTA))
+
+
+    IF ERRORCODE()  THEN      !If not enough memory
+       stop('Error al guardar el documento Comuníquese con el administrador del sistema') !display message
+       CYCLE
+    END
+END
+.--ABRIRLO NUEVAMENTE
+
+GLO:Handle = 0{PROP:Handle}
+GLO:Op     = 'Open'
+GLO:File   = CLIP(FNVALORVARIABLE('KGUIAS_PAT'))& CLIP(KGUIASD:RUTA)
+GLO:PathOpenfile   = PATH()
+GLO:Param  = ' '
+GLO:Show   = 1
+GLO:RetHandle =  ShellExecute(GLO:Handle,GLO:Op,GLO:File,GLO:Param,GLO:PathOpenfile,GLO:Show)
+If GLO:Rethandle = 0 Then
+  Message('Error','Error',Icon:Exclamation)
+End
+
+embedidos globlales
+	inside globla map
+		Module('Win32.lib')
+		ShellExecute(Long,*CString,*CString,*CString,*CString,Short),UShort,PASCAL,RAW,NAME('ShellExecuteA')
+		END
+		Include('clib.clw')
+	
+	after global include
+		INCLUDE('prnprop.clw')
+      
+      
+-- TABLE FIRMA
+!LOC:SQL='SELECT OBSERVACION FROM USVGS WHERE IDVARIABLE=''LICENCIA_TABLA_FIRMA'''
+!IF GLO:GRUPO='PPAL' AND FnValorVariable('IDDEPURAR')='SI'THEN
+!    BEEP
+!    SETCLIPBOARD(LOC:SQL)
+!    STOP('SQL')
+!END
+!CLEAR(WDUM:RECORD)
+!WDUM{PROP:SQL}=Loc:SQL
+!IF ERRORCODE()
+!    SETCLIPBOARD(LOC:SQL)
+!    BEEP(BEEP:SYSTEMHAND)
+!    MESSAGE('Lo sentimos. Se produjo un error cuando tratamos de procesar su solicitud.<13>Tenga la seguridad de que estamos trabajando para resolver el problema tan pronto como sea posible.<13>Por favor, si el problema persiste contacte al departamento de tecnología.<13>ERROR:' & FILEERROR(),'Krystalos...',ICON:HAND)
+!ELSE
+!    Access:WDUM.Next()
+!    RUN('KSignature '&WDUM:C1&' '&FnValorVariable('URLS_FIRMAS')&' '&IMOV:CNSMOV)
+!END
+IF IMOV:IDFIRMAENTRE='' OR IMOV:IDFIRMARECI=''
+   GLO:IDAUT='IMOV'
+   Win:FirmarDocumento(IMOV:CNSMOV,'Entregas_Unidad_Trasfuncional')
+   GLO:IDAUT=''
+END
+POST(EVENT:Accepted,?btnImprimirMovimiento)      

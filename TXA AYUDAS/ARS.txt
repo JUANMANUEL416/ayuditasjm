@@ -1,0 +1,86 @@
+CM  0000017346
+reporte para visualizarlo o no
+--ThisWindow.SkipPreview = FALSE
+
+Rpt:ErroresRips
+Brw:FactxAfiliado
+22108	
+0|1|R|2
+Brw:AfiArs:Elegir
+0|1|2
+IF UPPER(FNVALORVARIABLE('IDTIPOCXP_DEFAULT')) = 'ARS'
+
+Brw:FacturasPeriodo
+
+loc:tipocodiglosa
+
+  STOP('GLO:ETAPA='&FNSQLFMT(GLO:ETAPA))
+  
+  Brw:GenHistCenso
+  
+  Win:TraeVarias_RADD_FIN
+  KACAR
+  
+  KAAR0
+  AfiliadosARS:Elegir
+  'Activo'
+  kcxp0
+  WIN:VencimientosCXP
+  KAGN3
+  mdx:Elegir
+  
+  Brw:Autoriza_Elegir
+  
+  Brw:ConsultasRadd
+  Zoom
+  --Brw:MedAuditor
+  reportes financiero
+  
+  Rpt:raddfmt_comprimido
+  RPT:NotiFin
+  
+  301 775 5611
+  
+  Valor Glosas:
+  
+  WDU2{PROP:SQL} = 'UPDATE RADD SET CODETAPA = '& FNSQLFMT(LOC:CODETAPA) &' FROM RADD A WHERE ' & loc:filtro
+  
+  
+  RADN:CONSECUTIVO,RADN:ITEM
+  RADDFMT:Resumen
+  
+  RPT:NotiGlosa N
+  RPT:NotiObjGlosa A
+  
+  
+  BRW:ReporAudi
+  
+  Brw:SolicitudesCTC
+  
+  RADN:VLRCONCILIADO
+  RADDFMT:VRPORGLOSAR
+  
+  IF LOC:PORCENTAJE = 1 THEN
+   LOC:VLRAFIPS= (RADDFMT:VRPORGLOSAR * LOC:VLRCONAFIPS) / 100
+   LOC:VLRAFEPS= RADDFMT:VRPORGLOSAR - LOC:VLRAFIPS
+ELSE LOC:PORCENTAJE = 1 THEN
+   LOC:VLRAFIPS= LOC:VLRCONAFIPS
+   LOC:VLRAFEPS= RADDFMT:VRPORGLOSAR - LOC:VLRAFIPS
+END
+IF LOC:VLRAFIPS > RADDFMT:VRPORGLOSAR THEN
+   MESSAGE ('No se Puede conciliar por un Valor mayor Al Ratificado','Conciliaciones...',icon:hand)
+   CYCLE
+END
+  FC10417
+  --LOC:VLRCONAFIPS
+  
+  CAJA|BANCOS|GLOSAS|CXP|DEVOLUCION|TODOS
+  --CUANDO PASE A FINANCIERA Y VALOR GLOSA =0 PASAR A ESTADO 5
+  
+  clear(ftrd:record)
+  LOC:SQL=' SELECT CNSCXC FROM FCXCD WHERE N_FACTURA='&FNSQLFMT(FLEGD:N_FACTURA)
+  CLEAR(WDUM:RECORD)
+  WDUM{PROP:SQL}=LOC:SQL
+  ACCESS:WDUM.NEXT()
+  FLEGD:CNSCXC=WDUM:C1
+  

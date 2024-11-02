@@ -1,0 +1,41 @@
+ IF LOC:ERROR = 1
+    glo:TABLA       = 'AF'
+    glo:CAMPO       = 0
+    glo:REGISTRO    = 999
+    glo:descerrorips = 'ERRORES EN ARCHIVO DE FACTURACION - SE DETIENE LA VERIFICACION DE LOS OTROS ARCHIVOS'
+    ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+    WDUM{PROP:SQL}='SELECT COALESCE(MAX(ITEM),0) FROM ERRIPSD WHERE CNSVALIDA='&FNSQLFMT(GLO:CNSVALIDACION)
+    B#=0
+    ACCESS:WDUM.NEXT()
+    B#=WDU:C1+1
+    C# = 1
+    loop until C# > RECORDS(Glo:Errorips)
+       GET(Glo:Errorips, C#)
+       CLEAR(ERRIPSD:RECORD,-1)
+       ERRIPSD:CNSVALIDA=GLO:CNSVALIDACION
+       ERRIPSD:ENVIO= GLO:ENVIO
+       ERRIPSD:ITEM = B#
+       ERRIPSD:TABLA= glo:TABLA
+       ERRIPSD:CAMPO= glo:CAMPO&' REG: '&glo:registro
+       ERRIPSD:ERROR= glo:descerrorips
+       ACCESS:ERRIPSD.INSERT()
+       C# += 1
+       B# += 1
+    END
+    LOC:ERROR = 0
+ ELSE
+    CLEAR(WDUM:RECORD)
+    WDUM{PROP:SQL}='SELECT MAX(ITEM) FROM ERRIPSD WHERE CNSVALIDA='&FNSQLFMT(GLO:CNSVALIDACION)
+    B#=0
+    ACCESS:WDUM.NEXT()
+    B#=WDU:C1+1
+    C# = 1
+    CLEAR(ERRIPSD:RECORD,-1)
+    ERRIPSD:CNSVALIDA=GLO:CNSVALIDACION
+    ERRIPSD:ENVIO= GLO:ENVIO
+    ERRIPSD:ITEM = B#
+    ERRIPSD:TABLA= 'AF'
+    ERRIPSD:CAMPO= 'Total Registros.: '&LOC:NUMREG
+    ERRIPSD:ERROR= 'Validacion Final O.K.'
+    ACCESS:ERRIPSD.INSERT()
+ END

@@ -1,0 +1,140 @@
+Brw:NoticiasN
+
+SALUD|ADMINISTV
+
+ptcdp:compania=ptpto:compania    and ptcdp:consecutivo=ptpto:consecutivo
+
+
+VER_NOTIA
+
+Win:Mi_Agenda
+
+
+RptHistoriaClinicaQX_RED_1
+RptHistoriaClinicaQX_RED
+
+HADM:ELEGIR_a
+
+A_HCA_ON:Ficha_
+
+Rpt:OMedicas
+
+RptHistoriaClinicaEPI_01  STRING
+
+Win:AltaMed_HRED
+
+Rpt:OMedicas
+
+Rpt:Noposorden
+
+SPK_APLICAR_IACTH
+SPK_CONTAB_IACT
+
+
+LOC:SQL='SELECT COUNT(*),MODULO FROM NOTIA WHERE SISTEMA=''SALUD'' AND GETDATE()<FECHAAVI+1 AND ESTADO=''Activo'' '&CHR(13)&|
+        ' AND MODULO=''ASISTENCIAL'' OR MODULO=''TODOS'''&CHR(13)&|
+        ' GROUP BY MODULO'
+CLEAR(WDUM:RECORD)
+WDUM{PROP:SQL}=LOC:sQL
+ACCESS:WDUM.NEXT()
+IF WDU:C1>0 THEN
+   IF WDU:C2='ASISTENCIAL' OR WDU:C2='TODOS'
+      VER_NOTIA('SALUD','ASISTENCIAL')
+   END
+END
+ LOC:SQL='SELECT DISTINCT PREFIJO FROM HPRE INNER JOIN PRE ON HPRE.PREFIJO=PRE.PREFIJO '&CHR(13)&|
+         ' WHERE NOADMISION='&FNSQLFMT(GLO:NOADMISION)&' AND PREFIJO <>'&FNSQLFMT(FNVALORVARIABLE('PREFIJOMATERIALES'))
+ WDUM{PROP:SQL}=LOC:SQL
+ LOOP UNTIL ACCESS:WDUM.NEXT()
+            LOC:APREFIJO=WDU:C1
+            LOC:ANOMBREPRE=WDU:C2
+            PRINT(RPT:APREFIJO)
+            LOC:SQL=' SELECT DISTINCT HPRED.IDSERVICIO,SER.DESCSERVICIO '&CHR(13)&|
+                    ' FROM HPRE INNER JOIN HPRED ON HPRE.NOPRESTACION=HPRED.NOPRESTACION'&CHR(13)&|
+                    ' INNER JOIN SER ON HPRED.IDSERVICIO=SER.IDSERVICIO '&CHR(13)&|
+                    ' WHERE HPRE.PREFIJO='&FNSQLFMT(WDU:C1)&' AND HPRE.NOADMSION='&FNSQLFMT(GLO:NOADMSION)
+            CLEAR(WDU2:RECORD)
+            WDU2{PROP:SQL}=LOC:SQL
+            LOOP UNTIL ACCESS:WDU2.NEXT()
+                       LOC:ASERVICIO=WDU2:C1
+                       LOC:ADESCSERVICIO=WDU2:C2
+                       PRINT(RPT:ASERVICIOS)
+            END
+ END
+ 
+ 
+   IF FNVALORVARIABLE('ASI_VAL_CCAF_CARGOS') = 'SI'
+        LOC:SQL  = 'select COUNT(*) from kmcom ' & |
+                   ' where idtipocont= ''VENTAS'''& |
+                   ' AND PREFIJO= ''' & HPRE:PREFIJO & ''''&|
+                   ' AND CCOSTO = ''' & HPRE:CCOSTO & ''''&|
+                   ' AND IDAREA = ''' & HPRE:IDAREA &''''
+        WDUM{PROP:SQL} = LOC:SQL
+        if errorcode()
+        message('error en query:' & fileerror())
+        else
+            ACCESS:WDUM.NEXT()
+            IF WDU:C1 = 0
+                 MESSAGE('No existe configuracion contable para este prefijo, centro de costo y Area funcional.','CARGOS...',ICON:HAND)
+                 RETURN REQUESTCANCELLED
+            END
+
+        end
+  END
+  
+  
+ LOC:ESTANCIA = HRED:ESTANCIA
+
+ LOC:CLASEHOSP = ''
+ LOC:SQL='SELECT  CODIGO,DESCRIPCION FROM TGEN WHERE TABLA=''GENERAL'' AND CAMPO=''CLASEHOSP'''
+ IF FNVALORVARIABLE('IDDEPURAR') = 'SI' AND GLO:GRUPO = 'PPAL'
+    SETCLIPBOARD(LOC:SQL)
+    STOP('SQL')
+ END
+ CLEAR(WDUM:RECORD)
+ WDUM{PROP:SQL} = LOC:SQL
+ LOOP UNTIL ACCESS:WDUM.NEXT()
+    LOC:CLASEHOSP = CLIP(LOC:CLASEHOSP)&CLIP(wdu:c1)&'-'&CLIP(WDU:C2)&'|#'&CLIP(WDU:C2)&'|'
+ END
+ A# = LEN(CLIP(LOC:CLASEHOSP))
+ LOC:CLASEHOSP = SUB(LOC:CLASEHOSP,1,a#-1)
+ ?HRED:ESTANCIA{PROP:FROM} = LOC:CLASEHOSP
+ HRED:ESTANCIA = LOC:ESTANCIA
+ 
+    LOC:NOAUT = AUT:NOAUT
+    ELSE
+      !STOP('LOC:NOAUT='&LOC:NOAUT)
+      GLO:COPIAS =  fnvalorvariableSED(glo:idsede,'COPIASAUT')
+      IF GLO:COPIAS = 0
+         GLO:COPIAS = 2
+      END
+
+      GLO:NROIMP = 1
+      GLO:RPTCANCEL = 0
+      LOOP
+         IF AUT:IMPUTABLE_A = 'Subsidio Oferta' Then
+            Rpt:AUTSOferta
+            Case fnvalorvariableSED(glo:idsede,'FORMATOAUT')
+            OF 'MEDIACARTA'
+               rpt:ads_MED(loc:noaut)
+            ELSE
+               rpt:ads(loc:noaut,loc:firma)
+            END
+         Else
+            Case fnvalorvariableSED(glo:idsede,'FORMATOAUT')
+            Of 'MEDIACARTA'
+               rpt:ads_MED(loc:noaut)
+            Else
+               rpt:ads(loc:noaut,loc:firma)
+            End
+         End
+         BRW1.RESETFROMFILE
+         BRW5.RESETFROMFILE
+         THISWINDOW.RESET(1)
+         IF GLO:RPTCANCEL = 1 THEN BREAK.
+         GLO:NROIMP += 1
+         IF GLO:NROIMP > GLO:COPIAS THEN BREAK.
+      End
+   End
+   
+   Brw:Reconocimientos_Aud

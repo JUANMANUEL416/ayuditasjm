@@ -1,0 +1,45 @@
+if fcxpa:contabilizada = 1
+ Message('No se puede enviar mas de una vez un item a Contabilidad.','Contabilización',icon:hand)
+ cycle
+end
+
+setcursor(cursor:wait)
+
+clear(wdum:record)
+wdum{prop:sql} = |
+ 'EXEC SPK_CONTAB_AMORT '&FnSqlFmt(FCXPA:CNSFCXP)&', '&year(FCXPA:FECHA_DATE)&', '&month(FCXPA:FECHA_DATE)&', '&FnSqlFmt(glo:usuario)&', '&|
+                          FnSqlFmt(glo:sys_computername)&', '&FnSqlFmt(glo:compania)&', '&FnSqlFmt(glo:idsede)&', '&FnSqlFmt(FCXPA:NROCOMPROBANTE)
+setclipboard(wdum{prop:sql})
+setcursor()
+
+Brw1.ResetFromFile
+ThisWindow.Reset(true)
+
+---
+Comprobantes de Egreso
+
+   access:wdum.next()
+   case WDU:C1
+   of '01'
+      Rpt:CompContableEgreso:Contab
+   of '02'
+      Rpt:CompContableEgreso:No2
+   of '03'
+      case wdu:c2
+      of '01'
+         Rpt:CompContableEgreso:No3       !Cheque Normal
+      of '02'
+         Rpt:CompContableEgreso:No3_ChP   !Cheque Pequeño
+      end
+   of '04'
+      Rpt:CompContableEgreso:No4
+   of '05'
+      Rpt:CompContableEgreso:No5
+   else
+      Rpt:CompContableEgreso:Contab
+   end
+ELSE
+   Rpt:CompContable
+END
+
+Win:CambiaTer

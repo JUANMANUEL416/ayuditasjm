@@ -1,0 +1,33 @@
+62L(8)|M~Id. Prestador~@s21@
+
+QuickWindow          WINDOW('Frecuencia Del Afiliado'),AT(,,529,256),FONT('MS Sans Serif',8,,FONT:regular),CENTER,IMM,HLP('Brw:Frecuencia_Afi'),WALLPAPER('.\ICONOS\cuadrado.jpg'),SYSTEM,GRAY,RESIZE,MDI
+                       LIST,AT(8,46,505,167),USE(?Browse:1),IMM,HVSCROLL,MSG('Browsing the RPDX file'),FORMAT('62L(8)|M~Id. Prestador~@s21@180L(2)|M~Razóz Social~L(8)@s100@80L(2)|M~ID 14~L(8)' &|
+   '@s20@84L(2)|M~Id~L(8)@s21@240L(2)|M~STRINGMEDIO 2~L(8)@s100@84L(2)|M~Id~L(8)@s21' &|
+   '@80L(2)|M~ID 6~L(8)@s20@80L(2)|M~ID 19~L(8)@s20@56R(2)|M~CANTIDAD~L(8)@n-14@76R(' &|
+   '2)|M~VALOR 1~L(8)@n-19.2@'),FROM(Queue:Browse:1)
+                       SHEET,AT(4,18,522,220),USE(?CurrentTab)
+                         TAB('&1) Por CNS'),USE(?Tab:2)
+                         END
+                       END
+                       BUTTON('&Close'),AT(476,241,49,14),USE(?Close),FLAT,LEFT,MSG('Close Window'),TIP('Close Window'),ICON('WACLOSE.ICO')
+                     END
+
+					 
+					    ?Browse:1{prop:format} = '89L(2)|M~Nivel de Atención~@s120@56R(2)|M~Cantidad~L@n-14@'
+						
+FORMAT('62L(8)|M~Id. Prestador~@s21@180L(2)|M~Razóz Social~L(8)@s100@80L(2)|M~ID 14~L(8)' &|
+   '@s20@84L(2)|M~Id~L(8)@s21@240L(2)|M~STRINGMEDIO 2~L(8)@s100@84L(2)|M~Id~L(8)@s21' &|
+   '@80L(2)|M~ID 6~L(8)@s20@80L(2)|M~ID 19~L(8)@s20@56R(2)|M~CANTIDAD~L(8)@n-14@76R(' &|
+   '2)|M~VALOR 1~L(8)@n-19.2@')
+
+
+BRW6.Q.RPDX:VALOR2   
+
+BASE
+FORMAT('62L(8)|M~Id. Prestador~@s21@180L(2)|M~Razóz Social~L(8)@s100@45L(2)|M~Tipo_Doc~@' &|
+           's20@69L(2)|M~Id. Afiliado~L(8)@s21@177L(2)|M~Nombre Afiliado~L(8)@s100@31L(2)|M~' &|
+           'Edad~L(8)@s21@29L(2)|M~Para~@s20@48L(2)|M~Ambito~L(8)@s20@43R(2)|M~Cantidad~L(8)' &|
+           '@n-14@76R(2)|M~Valor~L(8)@n-19.2@')
+		   
+RPDX:IDTERCERO&RPDX:STRINGMEDIO1&RPDX:ID14&RPDX:ID2&RPDX:STRINGMEDIO2&RPDX:ID5&RPDX:ID6&RPDX:ID19&RPDX:CANTIDAD&RPDX:VALOR1
+RPDX:IDTERCERO,RPDX:STRINGMEDIO1,RPDX:ID14,RPDX:ID2,RPDX:STRINGMEDIO2,RPDX:ID5,RPDX:ID6,RPDX:ID19,RPDX:CANTIDAD,RPDX:VALOR1		   

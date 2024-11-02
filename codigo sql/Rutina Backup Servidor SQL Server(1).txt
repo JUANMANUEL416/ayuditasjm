@@ -1,0 +1,51 @@
+************************************************Respaldo Base de Datos********************************
+
+/*HACER LA COPIA DE SEGURIDAD*/
+DECLARE @NombreRAR varchar(8000)
+DECLARE @NombreCompleto varchar(8000)
+DECLARE @Ruta varchar(8000)
+
+/*NombreBackup SE REFIERE AL NOMBRE DE LA COPIA DE SEGURIDAD, PODRIA SER EL MISMO DE LA BASE DE DATOS PARA QUE LA PUEDAN IDENTIFICAR, NO ES NECESARIO CREAR EL DISPOSITIVO DE BACKUP ANTES.*/
+
+SET @NombreRAR='e:\Backups\Krystalosfsa' + + RTRIM(CONVERT(CHAR(16),GETDATE(),112)) + REPLACE(RTRIM(CONVERT(CHAR(16),GETDATE(),114)),':','') + '.rar'
+SET @NombreCompleto='e:\Backups\Krystalosfsa' + RTRIM(CONVERT(CHAR(16),GETDATE(),112)) + REPLACE(RTRIM(CONVERT(CHAR(16),GETDATE(),114)),':','') + '.bak'
+SET @Ruta='e:\Backups\'
+
+/*AQUI SE REALIZA LA COPIA DE SEGURIDAD*/
+BACKUP DATABASE [Krystalosfsa] TO DISK=@NombreCompleto WITH INIT, NOUNLOAD, NAME = N'Admin - Nombre Backup backup',  SKIP, NOREWIND, NOUNLOAD,  COMPRESSION, STATS = 10
+
+/*COMPRIMIR LA COPIA DE SEGURIDAD*/
+
+DECLARE @Orden varchar(8000)
+
+/*CON ESTA ORDEN SE COMPRIME LA COPIA DE SEGURIDAD Y LUEGO SE ELIMINA EL ARCHIVO ORIGINAL*/
+SET @Orden ='c:\archiv~1\winrar\rar.exe a -m5 -df ' + @NombreRAR + ' ' + @NombreCompleto
+EXEC master.dbo.xp_cmdshell @Orden
+
+go
+
+*********************************************************************Respaldo los logs**************************
+
+/*HACER LA COPIA DE SEGURIDAD*/
+DECLARE @NombreRAR varchar(8000)
+DECLARE @NombreCompleto varchar(8000)
+DECLARE @Ruta varchar(8000)
+
+/*NombreBackup SE REFIERE AL NOMBRE DE LA COPIA DE SEGURIDAD, PODRIA SER EL MISMO DE LA BASE DE DATOS PARA QUE LA PUEDAN IDENTIFICAR, NO ES NECESARIO CREAR EL DISPOSITIVO DE BACKUP ANTES.*/
+
+SET @NombreRAR='e:\Backups\Kixlogfsa' + + RTRIM(CONVERT(CHAR(16),GETDATE(),112)) + REPLACE(RTRIM(CONVERT(CHAR(16),GETDATE(),114)),':','') + '.rar'
+SET @NombreCompleto='e:\Backups\Kixlogfsa' + RTRIM(CONVERT(CHAR(16),GETDATE(),112)) + REPLACE(RTRIM(CONVERT(CHAR(16),GETDATE(),114)),':','') + '.bak'
+SET @Ruta='e:\Backups\'
+
+/*AQUI SE REALIZA LA COPIA DE SEGURIDAD*/
+BACKUP DATABASE [KIXLOGFSA] TO DISK=@NombreCompleto WITH INIT, NOUNLOAD, NAME = N'Admin - Nombre Backup backup', SKIP, NOREWIND, NOUNLOAD, COMPRESSION,  STATS = 10
+
+/*COMPRIMIR LA COPIA DE SEGURIDAD*/
+
+DECLARE @Orden varchar(8000)
+
+/*CON ESTA ORDEN SE COMPRIME LA COPIA DE SEGURIDAD Y LUEGO SE ELIMINA EL ARCHIVO ORIGINAL*/
+SET @Orden ='c:\archiv~1\winrar\rar.exe a -m5 -df ' + @NombreRAR + ' ' + @NombreCompleto
+EXEC master.dbo.xp_cmdshell @Orden
+
+go

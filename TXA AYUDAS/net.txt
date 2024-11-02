@@ -1,0 +1,22 @@
+
+namespace Kenti
+{
+    public class CIA    
+    {
+       public string  COMPANIA {get;set;}
+       public string  IDTERCERO {get;set;}
+       public string RAZONSOCIAL {get;set;}
+       public string TIPO_ID {get;set;}
+       public string  NIT {get;set;}
+       public string  DV {get;set;}
+       public string DIRECCION {get;set;}
+       public string TELEFONOS {get;set;}
+       public string DSN {get;set;}
+       public string IDSGSSS {get;set;}
+       public string CIUDAD  {get;set;}
+       public string SERVIDOR_DBBASE {get;set;}
+       public string DB_BASE {get;set;}
+       public string SERVIDOR_DBLOG {get;set;}
+       public string DB_LOG { get; set; }
+    }
+}

@@ -1,0 +1,62 @@
+clear(afi:record)
+ afi:idafiliado = ctca:idafiliado
+ if access:afi.tryfetch(AFI:AFIIDAFILIADO) then clear(afi:record).
+ loc:nomafiliado = clip(AFI:PAPELLIDO)&' '&clip(AFI:SAPELLIDO)&' '&clip(AFI:PNOMBRE)&' '&clip(AFI:SNOMBRE)
+ loc:plan        = afi:idplan
+
+ clear(ctcm:record)
+ CTCM:IDMEDTRATANTE = ctca:idmedtratante
+ if access:ctcm.tryfetch(CTCM:CTCMIDMEDTRATANTE) then clear(ctcm:record).
+ loc:nommed = clip(CTCM:APELLIDOS)&' '&clip(CTCM:NOMBRES)
+
+ clear(mdx:record)
+ mdx:iddx = ctca:iddx
+ if access:mdx.tryfetch(MDX:MDXIDDX) then clear(mdx:record).
+ loc:nomdx = MDX:DESCRIPCION
+
+ clear(ser:record)
+ ser:Idservicio = CTCA:IDSERVICIO
+ if access:ser.tryfetch(ser:seridservicio) then clear(ser:Record).
+
+ LOC:NOMNOPOS      = SER:DESCSERVICIO
+ loc:CODINVIMA     = SER:CODINVIMA
+ LOC:IDPRINACTIVO  = SER:IDPRINACTIVO
+ loc:IDFORFARM     = SER:IDFORFARM
+ LOC:TIENEHOMOLOGO = SER:TIENEHOMOLOGO
+ loc:PRESENTACION  = SER:PRESENTACION
+
+ CTCA:IDTARIFA  = fnvalorvariable('CTCATARIFANOPOS')
+ CTCA:IDTARIFAPOS  = fnvalorvariable('CTCATARIFAPOS')
+
+
+ CLEAR(IPAC:RECORD)
+ IPAC:IDPRINACTIVO = SER:IDPRINACTIVO
+ IF ACCESS:IPAC.TRYFETCH(IPAC:IPACIDPRINACTIVO) THEN CLEAR(IPAC:RECORD).
+
+ CLEAR(IFFA:RECORD)
+ IFFA:IDFORFARM    = SER:IDFORFARM
+ IF ACCESS:IFFA.TRYFETCH(IFFA:IFFAIDFORFARM) THEN CLEAR(IFFA:RECORD).
+
+
+ loc:DESCipac = IPAC:DESCRIPCION
+ loc:DESCffa  = IFFA:DESCRIPCION
+
+ clear(ser:record)
+ ser:Idservicio = CTCA:IDHOMOLOGO
+ if access:ser.tryfetch(ser:seridservicio) then clear(ser:Record).
+ LOC:DESCHOMOLOGO = SER:DESCSERVICIO
+
+ clear(ser:record)
+ ser:Idservicio = CTCA:codpos1
+ if access:ser.tryfetch(ser:seridservicio) then clear(ser:Record).
+ LOC:DESCpos1 = SER:DESCSERVICIO
+
+ clear(ser:record)
+ ser:Idservicio = CTCA:codpos2
+ if access:ser.tryfetch(ser:seridservicio) then clear(ser:Record).
+ LOC:DESCpos2 = SER:DESCSERVICIO
+
+ clear(ser:record)
+ ser:Idservicio = CTCA:codpos3
+ if access:ser.tryfetch(ser:seridservicio) then clear(ser:Record).
+ LOC:DESCpos3 = SER:DESCSERVICIO

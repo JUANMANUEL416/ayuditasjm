@@ -1,0 +1,29 @@
+
+
+gases arteriales 
+añadir:
+1. IO2 indice de oxigenacion
+2. D(Aa) diferencia alveolo arterial
+3. PAFI presion arteriar de oxigeno 
+intubacion y extubacion
+1.modo de oxigeno
+2. peso
+
+
+
+Rpt:FormulaMed_k
+Rpt:FormulaMed02_k
+Rpt:FormulaMed_Carta_k
+
+318 878 0805
+
+192.168.1.100-150 -199.
+
+
+win-88cjcdbvi2b
+
+
+?CPPAF:IDTERCEROCA:Prompt
+?CallLookup:3
+?CPPAF:IDPLANCA:Prompt
+?CallLookup:4

@@ -1,0 +1,39 @@
+ LOC:RUTAF = GetIni('RUTA','rutaExpor','','.\Krystalosx.ini')
+ A.OpenFile(loc:rutaf & 'EXPORTCART.xls')
+ SET(DPR)
+ NEXT(DPR)
+ A.Select('C2')
+ A.Assign(DPR:RazonSocial)
+ A.SetAlignment(10)
+ A.Select('C3')
+ A.Assign(DPR:Nit)
+ A.SetAlignment(10)
+ A.Select('C4')
+ A.Assign(DPR:Direccion)
+ A.SetAlignment(10)
+ A.Select('F5')
+ A.Assign('CARTERA DE FACTURAS DE SALUD - IDTERCERO: '&VWK_VCTOS:IDTERCERO&' A '&FORMAT(TODAY(),@D6))
+ A.SetAlignment(10)
+ A.Select('G6')
+ A.Assign('(Incluye Facturas Radicadas y Sin Radicar)')
+ A.SetAlignment(10)
+ CLEAR(TER:IDTERCERO)
+ TER:IDTERCERO=VWK_VCTOS:IDTERCERO
+ IF ACCESS:TER.TRYFETCH(TER:TERIDTERCERO) THEN CLEAR(TER:RECORD) END
+ A.Select('G7')
+ A.Assign(TER:IDTERCERO&' --'&CLIP(TER:RAZONSOCIAL))
+ A.SetAlignment(10)
+
+
+SET(BRW1.View)
+LOOP
+   NEXT(BRW1.View)
+   IF ERRORCODE() THEN BREAK.
+   BRW1.SETQUEUERECORD
+   IF BRW1.Q.VWK_CXCDIASVTO:N_FACTURA=''
+      CYCLE
+   END
+END
+
+A.Save(loc:rutaf & 'Cartera Detallada_'&VWK_VCTOS:IDTERCERO & '_' & TER:RAZONSOCIAL & '_' & format(today(),@d12) & '_' & format(clock(),@t2)  &'.xls')
+MESSAGE('Proceso de Exportacion Terminado')

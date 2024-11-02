@@ -1,0 +1,9 @@
+
+MARCAR CON DOBLE CLIC
+
+BROWSE ALERT KEY
+
+CASE KEYCODE()    !Process the keystroke
+OF MouseLeft2
+  post(event:accepted,?BMarcar)
+END

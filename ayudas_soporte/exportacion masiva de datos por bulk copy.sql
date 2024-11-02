@@ -1,0 +1,1 @@
+bcp "SELECT N_FACTURA, IDTERCERO FROM FTR " queryout "C:\AENVIAR\facturas.txt" -c -T -t ,

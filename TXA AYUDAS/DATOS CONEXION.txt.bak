@@ -1,0 +1,46 @@
+   GLO:DSN        = GETINI('DATOS','FUENTE','krystalos','.\KrystalosX.INI')
+   GLO:DSNLG      = GETINI('DATOS','FUENTELOG','KIXLOG','.\KrystalosX.INI')
+   GLO:SERVIDOR   = GETINI('DATOS','SERVIDOR','','.\KrystalosX.INI')
+   GLO:USRUT      = GETINI('DATOS','FUENTE','krystalos','.\KrystalosX.INI')
+   LOC:RUTADATOS  = GETINI('DATOS','FUENTE','krystalos','.\KrystalosX.INI')
+   GLO:DSNCIA     = CLIP(GLO:SERVIDOR)&',BDIX,,'
+   LOC:ENTRY        = clip(glo:compania) & clip(glo:aplicaciON)
+   Glo:Conexion   = ' /LOGONSCREEN = FALSE /TRUSTEDCONNECTION = TRUE '
+   GLO:CONEXIONLG = ' /LOGONSCREEN = FALSE /TRUSTEDCONNECTION = TRUE '
+   GLO:CONEXIONB  = ' /LOGONSCREEN = FALSE /TRUSTEDCONNECTION = TRUE '
+   
+   
+   ----
+   GLO:SERVIDOR   = GETINI('DATOS','SERVIDOR','','.\Agenda.INI')
+   GLO:BASED	  = GETINI('DATOS','BDATOS','','.\Agenda.INI')
+   GLO:DSN        = CLIP(GLO:SERVIDOR)&','&CLIP(GLO:BASED)&',,'
+   GLO:DSN     = CLIP(GLO:SERVIDOR)&',CLIP(GLO:BASED),,'
+   GLO:CONEXION   = ' /LOGONSCREEN = FALSE /TRUSTEDCONNECTION = TRUE '
+   GLO:CONEXIONLG = ' /LOGONSCREEN = FALSE /TRUSTEDCONNECTION = TRUE '
+   GLO:CONEXIONB = ' /LOGONSCREEN = FALSE /TRUSTEDCONNECTION = TRUE '
+
+   
+   Glo:Conexion   = ' /LOGONSCREEN = FALSE /TRUSTEDCONNECTION = TRUE '
+   
+----
+   GLO:SERVIDOR   = GETINI('DATOS','SERVIDOR','','.\Agenda.INI')
+   GLO:BASED      = GETINI('DATOS','BDATOS','','.\Agenda.INI')
+   GLO:DSN        = CLIP(GLO:SERVIDOR)&','&CLIP(GLO:BASED)&',,'
+
+   Glo:Conexion   = ' /LOGONSCREEN = FALSE /TRUSTEDCONNECTION = TRUE '   
+   
+   
+      ACCESS:WDUM.NEXT()
+   IF FnEncriptaDes(WDU:C1,2) <> GLO:PASSWORD
+      MEssage('Usuario/Clave Inválido(s)','SEGURIDAD...',icon:hand)
+      RELATE:WDUM.CLOSE
+      cycle
+   END
+   
+   ---      
+   Glo:Conexion   = ' /LOGONSCREEN = FALSE '
+      GLO:CONEXIONLG = ' /LOGONSCREEN = FALSE '
+      GLO:CONEXIONB  = ' /LOGONSCREEN = FALSE '
+      GLO:DSN        = CLIP(CIA:SERVIDOR_DBBASE)&','&CLIP(CIA:DB_BASE)&','&clip(loc:user)&','&clip(loc:pwd)
+      GLO:DSNLG      = CLIP(CIA:SERVIDOR_DBLOG)&','&CLIP(CIA:DB_LOG)&','&clip(loc:user)&','&clip(loc:pwd)
+   Else

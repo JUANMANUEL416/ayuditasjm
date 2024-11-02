@@ -1,0 +1,56 @@
+/************************************************************************************/
+IF EXISTS (SELECT name FROM sysobjects 
+   WHERE name = 'SPKH_REINDEXAR' AND type = 'P')
+   DROP PROCEDURE SPKH_REINDEXAR
+GO 
+/************************************************************************************/
+CREATE PROC DBO.SPKH_REINDEXAR
+@TABLA    VARCHAR(256)
+AS
+DECLARE @AUX      INT
+DECLARE @COMANDO  VARCHAR(4000)
+DECLARE @NOMBREDB VARCHAR(255)
+DECLARE @TABLA_R  VARCHAR(255)
+BEGIN
+   SELECT @NOMBREDB = DB_NAME()
+   IF COALESCE(@TABLA,'') = ''
+   BEGIN
+      PRINT('NO ESCRIBIO TABLA A REINDEXAR. SI QUIERE REINDEXAR TODA LA BASE DE DATOS ACTUAL ENVIE COMO PARAMETRO ''TODAS''')
+      RETURN
+   END
+   IF COALESCE(@TABLA,'') <> 'TODAS'
+   BEGIN
+      SELECT @AUX = COALESCE(COUNT(*),0) FROM SYSOBJECTS WHERE NAME = @TABLA AND TYPE = 'U'
+      IF @AUX = 0
+      BEGIN
+         PRINT 'EL PARAMETRO DADO '''+@TABLA+''' NO ES UNA TABLA DE ESTA BASE DE DATOS'
+         RETURN
+      END
+      ELSE
+      BEGIN
+         SELECT @COMANDO = 'DBCC DBREINDEX ( "'+@TABLA+'")'  
+         --SELECT @COMANDO 
+         EXEC (@COMANDO)
+      END
+   END
+   ELSE
+   BEGIN
+      DECLARE T_CURSOR CURSOR FOR  
+      SELECT NAME FROM SYSOBJECTS WHERE TYPE = 'U'
+      OPEN T_CURSOR  
+      FETCH NEXT FROM T_CURSOR  
+      INTO @TABLA_R
+      WHILE @@FETCH_STATUS = 0  
+      BEGIN        
+         SELECT @COMANDO = 'DBCC DBREINDEX ( "'+@TABLA_R+'")'  
+         --SELECT @COMANDO 
+         EXEC (@COMANDO)
+         FETCH NEXT FROM T_CURSOR  
+         INTO @TABLA_R      
+      END
+      CLOSE T_CURSOR
+      DEALLOCATE T_CURSOR   
+   END
+END
+GO
+

@@ -1,0 +1,78 @@
+IF RADFIN:FACCONCILIADAS = 0
+  Loc:TitMensImp  = 'Paso a Financiera'
+ELSIF RADFIN:FACCONCILIADAS = 1
+  Loc:TitMensImp  = 'Levantamiento de Glosas'
+ELSE RADFIN:FACCONCILIADAS = 2
+  Loc:TitMensImp  = 'Conciliación  de Glosas'
+END
+
+
+CASE MESSAGE('Está Seguro(a) de Imprimir el ' & Loc:TitMensImp ,Loc:TitMensImp,icon:question,button:yes+button:no, button:no,1)
+ OF BUTTON:No
+    cycle
+ OF BUTTON:yES
+    loc:sql = 'SELECT CONSECUTIVO, ITEM FROM RADFIND WHERE CNSFINANC = '&FNSQLFMT(RADFIN:CNSFINANC)
+    CLEAR(WDU2:RECORD)
+    !SETCLIPBOARD(LOC:SQL)
+    !STOP()
+    WDU2{PROP:SQL} = LOC:SQL
+
+    IF RADFIN:FACCONCILIADAS = 1
+
+        CASE MESSAGE('Imprimir solo el Consolidado?',Loc:TitMensImp,icon:question,button:yes+button:no, button:no,1)
+        OF BUTTON:No
+          LOOP UNTIL ACCESS:WDU2.NEXT()
+             !stop('WDU2:C1='&WDU2:c1&', WDU2:C2='&WDU2:C2)
+             Rpt:raddfmt_comprimido(WDU2:C1, WDU2:C2)
+          END
+           RPT:NotiFin
+
+        OF BUTTON:yES
+            RPT:NotiFin
+        END
+
+    ELSE
+        CASE MESSAGE('Imprimir solo el Consolidado?',Loc:TitMensImp,icon:question,button:yes+button:no, button:no,1)
+        OF BUTTON:No
+          LOOP UNTIL ACCESS:WDU2.NEXT()
+             !stop('WDU2:C1='&WDU2:c1&', WDU2:C2='&WDU2:C2)
+             Rpt:raddfmt_comprimido_LG(WDU2:C1, WDU2:C2)
+          END
+           RPT:NotiFin_LG
+
+        OF BUTTON:yES
+            RPT:NotiFin_LG
+        END
+     END
+   IF RADFIN:FACCONCILIADAS = 2
+
+        CASE MESSAGE('Imprimir solo el Consolidado?',Loc:TitMensImp,icon:question,button:yes+button:no, button:no,1)
+        OF BUTTON:No
+          LOOP UNTIL ACCESS:WDU2.NEXT()
+             !stop('WDU2:C1='&WDU2:c1&', WDU2:C2='&WDU2:C2)
+             Rpt:raddfmt_comprimido(WDU2:C1, WDU2:C2)
+          END
+           RPT:NotiFin
+
+        OF BUTTON:yES
+            RPT:NotiFin
+        END
+
+    ELSE
+        CASE MESSAGE('Imprimir solo el Consolidado?',Loc:TitMensImp,icon:question,button:yes+button:no, button:no,1)
+        OF BUTTON:No
+          LOOP UNTIL ACCESS:WDU2.NEXT()
+             !stop('WDU2:C1='&WDU2:c1&', WDU2:C2='&WDU2:C2)
+             Rpt:raddfmt_comprimido_LG(WDU2:C1, WDU2:C2)
+          END
+           RPT:NotiFin_LG
+
+        OF BUTTON:yES
+            RPT:NotiFin_LG
+        END
+     END
+
+
+
+    THISWINDOW.RESET(1)
+ End

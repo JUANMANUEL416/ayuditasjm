@@ -1,0 +1,30 @@
+!Window Manager - Open Report    - Despues del PC
+ set(dpr)
+ next(dpr)
+ glo:logocliente = dpr:ubicalogo
+ if loc:noregistros <> 1
+    !Report$?logocliente{prop:text}=glo:logocliente
+ end
+
+ glo:logocliente = dpr:ubicalogo
+    Report$?logocliente{prop:text}=glo:logocliente
+ 
+ 
+  Process:View{Prop:SqlFilter} = Loc:filtro
+  
+PIE PAGINA
+         STRING('Date:'),AT(115,52,344,135),USE(?ReportDatePrompt,,?ReportDatePrompt:2),TRN,FONT('Arial',8,,FONT:regular), |
+             #SEQ(1),#ORIG(?ReportDatePrompt)
+         STRING('<<-- Date Stamp -->'),AT(490,52,927,135),USE(?ReportDateStamp,,?ReportDateStamp:2),TRN, |
+             FONT('Arial',8,,FONT:regular),#SEQ(1),#ORIG(?ReportDateStamp)
+         STRING('Time:'),AT(1625,52,271,135),USE(?ReportTimePrompt,,?ReportTimePrompt:2),TRN,FONT('Arial',8,,FONT:regular), |
+             #SEQ(2),#ORIG(?ReportTimePrompt)
+         STRING('<<-- Time Stamp -->'),AT(1927,52,927,135),USE(?ReportTimeStamp,,?ReportTimeStamp:2), |
+             TRN,FONT('Arial',8,,FONT:regular),#SEQ(2),#ORIG(?ReportTimeStamp)
+         STRING(@pPage <<#p),AT(6950,52,700,135),PAGENO,USE(?PageCount,,?PageCount:2),FONT('Arial',8,,FONT:regular)
+
+		 
+		 SAN LUIS -- 
+       
+LOC:FILTRO4=' IDTUTEL='&FNSQLFMT(TUTEL:IDTUTEL)
+ BRW5::View:Browse{PROP:SQLFILTER}=LOC:FILTRO4       

@@ -1,0 +1,53 @@
+if clip(RIPS_US:TIPO_DOC) = ''
+          glo:TABLA       = 'US' ; glo:CAMPO       = 'TIPODOC' ;  glo:REGISTRO    = LOC:NUMREG
+          glo:descerrorips = 'DATO NO EXISTE'
+          ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+          LOC:ERROR = 1
+       end
+	   
+	   --AC
+	   DO TIPO_DOC_AC
+	                if clip(RIPS_AC:TIPO_DOC) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'TIPODOC'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+			 
+	 FECHA CONSULTA
+	 FINALIDAD
+	              if clip(RIPS_AC:FINCONSULTA) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'FINCONSULTA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+			 
+CAUSA EXTERNA
+	              if clip(RIPS_AC:CAUSAEXT) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'CAUSAEXTERNA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+			 
+DO TIPO_DOC_AH
+			             if clip(RIPS_AH:TIPO_DOC) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'TIPODOCUMENTO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+
+DO VALIDA_AD			 
+		              if clip(RIPS_AD:CODCONCEPTO) = ''
+                glo:TABLA       = 'AD'
+                glo:CAMPO       = 'CODCONCEPTO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end

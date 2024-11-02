@@ -1,0 +1,5 @@
+user de vpn: jjimenez
+contraseña: &D;{E}bN}?bRF\Cv
+
+user de server: soportekrystalos
+contraseña: &D;{E}bN}?bRF\Cv

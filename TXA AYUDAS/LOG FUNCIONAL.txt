@@ -1,0 +1,67 @@
+ if glo:idarticulo <> ''
+    CLEAR(IART:IDARTICULO)
+    IART:IDARTICULO = GLO:IDARTICULO
+    IF ACCESS:IART.TRYFETCH(IART:IARTIDARTICULO) = level:benign
+       WDF{PROP:SQL} = 'SELECT GETDATE()'
+       ACCESS:WDF.NEXT()
+       CLEAR(USLOG:RECORD)
+       USLOG:CNSLOG     = clip(glo:idsede)&format(FnGeneraconsecutivo(glo:idsede,'@LOG'),@n08)
+       USLOG:COMPANIA   = GLO:COMPANIA
+       USLOG:NOADMISION = IART:IDARTICULO
+       USLOG:PROCESO    = 'PCOSTO'
+       USLOG:REQUEST    = 'INSERT'
+       USLOG:REFERENCIA = 'IDARTICULO ='&IART:IDARTICULO
+       USLOG:USUARIO    = GLO:USUARIO
+       USLOG:FECHA_DATE = WDF:C1_DATE
+       USLOG:FECHA_TIME = WDF:C1_TIME
+       USLOG:SYS_ComputerName = GLO:SYS_ComputerName
+	    USLOG:TABLA=''
+       ACCESS:USLOG.INSERT()
+       CLEAR(USLOGH:RECORD)
+       USLOGH:CNSLOG   = USLOG:CNSLOG
+       USLOGH:ITEM     = 1
+       USLOGH:CAMPO    = 'PCOSTO'
+       USLOGH:VALORANT = IART:PCOSTO
+       USLOGH:VALORNVO = LOC:PCOSTO
+       ACCESS:USLOGH.INSERT()
+       IART:PCOSTO = loc:pcosto
+       ACCESS:IART.UPDATE()
+       Message('Pcosto Ajustado','Inventario',icon:hand)
+       POST(EVENT:CLOSEWINDOW)
+    end
+ end
+deseos de cosas imposibles
+---
+   LOC:SQL='UPDATE HADMAD SET CERRADA=3,NUMERO=''ANULADA_''+DBO.FNK_HORAS(GETDATE())  WHERE NOADMISION='&FNSQLFMT(HADMAD:NOADMISION)&' AND TIPO='&FNSQLFMT(HADMAD:TIPO)&' AND NUMERO='&FNSQLFMT(HADMAD:NUMERO)
+      CLEAR(WDUM:RECORD)
+      SETCLIPBOARD(LOC:SQL)
+      STOP('UPDATE')
+      WDUM{PROP:SQL}=LOC:SQL
+      WDF{PROP:SQL} = 'SELECT GETDATE()'
+      ACCESS:WDF.NEXT()
+      CLEAR(USLOG:RECORD)
+      USLOG:CNSLOG     = clip(glo:idsede)&format(FnGeneraconsecutivo(glo:idsede,'@LOG'),@n08)
+      USLOG:COMPANIA   = GLO:COMPANIA
+      USLOG:NOADMISION = GLO:NOADMISION
+      USLOG:PROCESO    = 'QUITA ALTA UCI'
+      USLOG:REQUEST    = 'ALTA'
+      USLOG:REFERENCIA = 'NOADMISION ='&GLO:NOADMISION
+      USLOG:USUARIO    = GLO:USUARIO
+      USLOG:FECHA_DATE = WDF:C1_DATE
+      USLOG:FECHA_TIME = WDF:C1_TIME
+      USLOG:SYS_ComputerName = GLO:SYS_ComputerName
+      ACCESS:USLOG.INSERT()
+      CLEAR(USLOGH:RECORD)
+      USLOGH:CNSLOG   = USLOG:CNSLOG
+      USLOGH:ITEM     = 1
+      USLOGH:CAMPO    = 'HADMAD:CERRADA'
+      USLOGH:VALORANT = '0'
+      USLOGH:VALORNVO = '3'
+      ACCESS:USLOGH.INSERT()
+
+      MESSAGE('Alta Retirada Con Exito','Alta Uci',ICON:HAND)
+      BRW1.RESETFROMFILE()
+      THISWINDOW.RESET(1)
+      
+      https://escueladepadres4.blogspot.com/
+      http://skaclub63.blogspot.com/2019/01/decibelios-caldo-de-pollo-y-los.html

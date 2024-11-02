@@ -1,0 +1,1396 @@
+ disable(?Validar)
+ SET(DPR)
+ NEXT(DPR)
+ glo:n_ac = 0 ; glo:n_ad = 0 ; glo:n_af = 0 ; glo:n_us = 0 ; glo:n_ap = 0
+ glo:n_ah = 0 ; glo:n_au = 0 ; glo:n_an = 0 ; glo:n_am = 0 ; glo:n_at = 0
+ FREE(GLO:ERRORIPS)
+ FREE(LOC:TOTALRIPS)
+ FREE(LOC:USUARIOS)
+ FREE(LOC:FACTURAS)
+ clear(rips_ct:RECORD,-1)
+ set(rips_ct)
+ loop until access:rips_ct.next()
+      if instring('AC',rips_ct:codigoarchivo,1,1)
+         loc:archivo = 'AC' ; glo:n_ac = 1
+      elsif instring('AD',rips_ct:codigoarchivo,1,1)
+         loc:archivo = 'AD' ;         glo:n_ad = 1
+      elsif instring('AF',rips_ct:codigoarchivo,1,1)
+         loc:archivo = 'AF'  ;         glo:n_af = 1
+      elsif instring('US',rips_ct:codigoarchivo,1,1)
+         loc:archivo = 'US'  ;          glo:n_us = 1
+      elsif instring('AP',rips_ct:codigoarchivo,1,1)
+          loc:archivo = 'AP' ;          glo:n_ap = 1
+      elsif instring('AH',rips_ct:codigoarchivo,1,1)
+          loc:archivo = 'AH' ;          glo:n_ah = 1
+      elsif instring('AU',rips_ct:codigoarchivo,1,1)
+          loc:archivo = 'AU' ;          glo:n_au = 1
+      elsif instring('AN',rips_ct:codigoarchivo,1,1)
+          loc:archivo = 'AN' ;          glo:n_an = 1
+      elsif instring('AM',rips_ct:codigoarchivo,1,1)
+          loc:archivo = 'AM' ;          glo:n_am = 1
+      elsif instring('AT',rips_ct:codigoarchivo,1,1)
+          loc:archivo = 'AT' ;          glo:n_at = 1
+      end
+      loc:registros = RIPS_CT:TOTALREGISTROS
+      add(loc:totalrips)
+ end
+ LOC:NR_COLA = RECORDS(LOC:TOTALRIPS)
+ LOC:ERROR = 0
+ if glo:n_us = 1
+    loc:mensaje = 'VALIDANDO Archivo de Usuarios'
+    display
+    LOC:NUMREG = 1
+    clear(rips_us:record,-1)
+    set(rips_us)
+    Loop until access:rips_us.next()
+       if clip(RIPS_US:TIPO_DOC) = ''
+          glo:TABLA       = 'US' ; glo:CAMPO       = 'TIPODOC' ;  glo:REGISTRO    = LOC:NUMREG
+          glo:descerrorips = 'DATO NO EXISTE'
+          ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+          LOC:ERROR = 1
+       end
+       if clip(RIPS_US:IDUSUARIO) = ''
+          glo:TABLA       = 'US' ; glo:CAMPO  = 'IDUSUARIO' ;  glo:REGISTRO    = LOC:NUMREG
+          glo:descerrorips = 'DATO NO EXISTE'
+          ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+          LOC:ERROR = 1
+       end
+       if clip(RIPS_US:CODENTIDADM) = ''
+          glo:TABLA       = 'US' ; glo:CAMPO       = 'CODENTIADMINIST'; glo:REGISTRO    = LOC:NUMREG
+          glo:descerrorips = 'DATO NO EXISTE'
+          ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+          LOC:ERROR = 1
+       end
+       IF CLIP(RIPS_US:CODENTIDADM) <> DPR:idsgsss
+          glo:TABLA       = 'US' ; glo:CAMPO       = 'CODADMINISTRADORA';  glo:REGISTRO    = LOC:NUMREG
+          glo:descerrorips = 'DATO NO CORRESPONDE A ' & CLIP(DPR:RazonSocial)
+          ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+          LOC:ERROR = 1
+       END
+       IF CLIP(RIPS_US:UNMEDIDA) <> '1' AND CLIP(RIPS_US:UNMEDIDA) <> '2' AND CLIP(RIPS_US:UNMEDIDA) <> '3'
+          glo:TABLA       = 'US' ; glo:CAMPO       = 'UNIDADMEDIDA';  glo:REGISTRO    = LOC:NUMREG
+          glo:descerrorips = 'DATO NO VALIDO. VALORES PERMITIDOS : ( 1, 2, 3 )'
+          ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+          LOC:ERROR = 1
+       END
+       IF CLIP(RIPS_US:EDAD) < 0 OR CLIP(RIPS_US:EDAD) > 130
+          glo:TABLA       = 'US' ; glo:CAMPO       = 'EDAD';  glo:REGISTRO    = LOC:NUMREG
+          glo:descerrorips = 'DATO NO VALIDO. VALORES PERMITIDOS : ( 0, 130 )'
+          ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+          LOC:ERROR = 1
+       END
+       if clip(RIPS_US:SEXO) <> 'M' AND CLIP(RIPS_US:SEXO) <> 'F'
+          glo:TABLA       = 'US' ; glo:CAMPO       = 'SEXO';  glo:REGISTRO    = LOC:NUMREG
+          glo:descerrorips = 'DATO NO VALIDO. VALORES PERMITIDOS : ( M, F )'
+          ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+          LOC:ERROR = 1
+       END
+       LOC:ID = RIPS_US:IDUSUARIO
+       ADD(LOC:USUARIOS,+LOC:ID)
+       LOC:NUMREG += 1
+    End
+    LOOP I# = 1 TO LOC:NR_COLA
+       GET(LOC:TOTALRIPS,I#)
+       IF LOC:ARCHIVO = 'US'
+          IF loc:registros <> LOC:NUMREG - 1
+             glo:TABLA       = 'US'; glo:CAMPO = 0 ; glo:REGISTRO    = 0
+             glo:descerrorips = 'NUMERO DE REGISTROS DEL ARCHIVO DE CONTROL NO COINCIDE CON EL ARCHIVO (' & LOC:REGISTROS & '-' & LOC:NUMREG & ')'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          END
+       END
+    END
+ end
+ IF LOC:ERROR = 1
+    if glo:validartodo = 1
+       message('ERRORES EN ARCHIVO DE USUARIOS'&chr(13)&|
+               'Sin embargo se continua la validación de otros archivos,'&chr(13)&|
+               'Por estar marcada la opción Validar todo','RIPS', ICON:HAND)
+       LOC:ERROR = 0
+    else
+       glo:TABLA       = 'US' ; glo:CAMPO  = 0 ; glo:REGISTRO    = 999; glo:descerrorips = ''
+       ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+       glo:TABLA       = 'US' ; glo:CAMPO  = 0 ; glo:REGISTRO    = 999
+       glo:descerrorips = 'ERRORES EN ARCHIVO DE USUARIOS - SE DETIENE LA VERIFICACION DE LOS OTROS ARCHIVOS'
+       ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+    end
+ END
+ IF LOC:ERROR = 0
+    LOC:ERROR = 0
+    if glo:n_af = 1
+       loc:mensaje = 'VALIDANDO Archivo de Facturación'
+       display
+       LOC:NUMREG = 1
+       clear(rips_af:record,-1)
+       set(rips_af)
+       loop until access:rips_af.next()
+          !!!!!!!!!!!  06/02/03
+          Glo:Nofactura     = RIPS_AF:NUMFACTURA
+          Glo:Valor_Af      = RIPS_AF:VALORNETO
+          Glo:Valor_total   = 0
+          ADD(Glo:Factura,+Glo:Nofactura,+Glo:Valor_Af,+Glo:Valor_total)
+          !!!!!!!!!!!
+          if clip(RIPS_AF:IDPRESTADOR) = ''
+             glo:TABLA       = 'AF' ; glo:CAMPO  = 'IDPRESTADOR' ; glo:REGISTRO = LOC:NUMREG
+             glo:descerrorips = 'DATO NO EXISTE'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          if clip(RIPS_AF:RAZONSOCIAL) = ''
+             glo:TABLA       = 'AF' ;glo:CAMPO = 'RAZONSOCIAL' ; glo:REGISTRO = LOC:NUMREG
+             glo:descerrorips = 'DATO NO EXISTE'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          if clip(RIPS_AF:TIPO_ID) = ''
+             glo:TABLA       = 'AF' ; glo:CAMPO = 'TIPOID' ; glo:REGISTRO  = LOC:NUMREG
+             glo:descerrorips = 'DATO NO EXISTE'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          if clip(RIPS_AF:NUMIDENTIFICACION) = ''
+             glo:TABLA       = 'AF' ; glo:CAMPO = 'NUMIDENTIFICA' ; glo:REGISTRO  = LOC:NUMREG
+             glo:descerrorips = 'DATO NO EXISTE'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          if clip(RIPS_AF:NUMFACTURA) = ''
+             glo:TABLA       = 'AF' ;  glo:CAMPO       = 'NUMFACTURA'
+             glo:REGISTRO    = LOC:NUMREG ;  glo:descerrorips = 'DATO NO EXISTE'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          if clip(RIPS_AF:FECHAEXPEDICION) = ''
+             glo:TABLA       = 'AF' ; glo:CAMPO  = 'FECHAEXPED.'
+             glo:REGISTRO    = LOC:NUMREG  ;  glo:descerrorips = 'DATO NO EXISTE'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          LOC:RF = 0
+          LOC:DIA = SUB(RIPS_AF:FECHAEXPEDICION,1,2)
+          LOC:SEP1 = SUB(RIPS_AF:FECHAEXPEDICION,3,1)
+          LOC:MES = SUB(RIPS_AF:FECHAEXPEDICION,4,2)
+          LOC:SEP2 = SUB(RIPS_AF:FECHAEXPEDICION,6,1)
+          LOC:ANO = SUB(RIPS_AF:FECHAEXPEDICION,7,4)
+          IF LOC:SEP1 <> '/'
+             LOC:RF = 1
+          END
+          IF LOC:SEP2 <> '/' THEN LOC:RF = 1  END
+          IF LOC:DIA < 1 OR LOC:DIA > 31 THEN LOC:RF = 1 END
+          IF LOC:MES < 1 OR LOC:MES > 12 THEN LOC:RF = 1 END
+          IF LOC:RF = 1
+             glo:tabla       = 'AF' ;  glo:campo = 'FECHAEXPEDICION' ; glo:registro = LOC:NUMREG
+             glo:descerrorips = 'FECHA INVALIDA'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             loc:error = 1
+          END
+          if clip(RIPS_AF:FECHAINICIO) = ''
+             glo:TABLA       = 'AF' ; glo:CAMPO = 'FECHAINICIO' ; glo:REGISTRO = LOC:NUMREG
+             glo:descerrorips = 'DATO NO EXISTE'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          LOC:RF = 0
+          LOC:DIA = SUB(RIPS_AF:FECHAINICIO,1,2) ; LOC:SEP1 = SUB(RIPS_AF:FECHAINICIO,3,1)
+          LOC:MES = SUB(RIPS_AF:FECHAINICIO,4,2) ; LOC:SEP2 = SUB(RIPS_AF:FECHAINICIO,6,1)
+          LOC:ANO = SUB(RIPS_AF:FECHAINICIO,7,4)
+          IF LOC:SEP1 <> '/' THEN LOC:RF = 1 END
+          IF LOC:SEP2 <> '/' THEN LOC:RF = 1 END
+          IF LOC:DIA < 1 OR LOC:DIA > 31 THEN LOC:RF = 1 END
+          IF LOC:MES < 1 OR LOC:MES > 12 THEN LOC:RF = 1 END
+          IF LOC:RF = 1
+             glo:tabla       = 'AF' ; glo:campo   = 'FECHAINICIO'
+             glo:registro    = LOC:NUMREG ;  glo:descerrorips = 'FECHA INVALIDA'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             loc:error = 1
+          END
+          if clip(RIPS_AF:FECHAFINAL) = ''
+             glo:TABLA       = 'AF' ;  glo:CAMPO       = 'FECHAFINAL'
+             glo:REGISTRO    = LOC:NUMREG ; glo:descerrorips = 'DATO NO EXISTE'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          LOC:RF = 0
+          LOC:DIA = SUB(RIPS_AF:FECHAFINAL,1,2) ; LOC:SEP1 = SUB(RIPS_AF:FECHAFINAL,3,1)
+          LOC:MES = SUB(RIPS_AF:FECHAFINAL,4,2) ; LOC:SEP2 = SUB(RIPS_AF:FECHAFINAL,6,1)
+          LOC:ANO = SUB(RIPS_AF:FECHAFINAL,7,4)
+          IF LOC:SEP1 <> '/' THEN LOC:RF = 1 END
+          IF LOC:SEP2 <> '/' THEN LOC:RF = 1 END
+          IF LOC:DIA < 1 OR LOC:DIA > 31 THEN LOC:RF = 1 END
+          IF LOC:MES < 1 OR LOC:MES > 12 THEN LOC:RF = 1 END
+          IF LOC:RF = 1
+             glo:tabla       = 'AF'
+             glo:campo       = 'FECHAFINAL'
+             glo:registro    = LOC:NUMREG
+             glo:descerrorips = 'FECHA INVALIDA'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             loc:error = 1
+          END
+          if clip(RIPS_AF:CODENTIDADM) = ''
+             glo:TABLA       = 'AF'
+             glo:CAMPO       = 'CODADMINISTRADORA'
+             glo:REGISTRO    = LOC:NUMREG
+             glo:descerrorips = 'DATO NO EXISTE'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          IF CLIP(RIPS_AF:CODENTIDADM) <> DPR:idsgsss
+             glo:TABLA       = 'AF'
+             glo:CAMPO       = 'CODADMINISTRADORA'
+             glo:REGISTRO    = LOC:NUMREG
+             glo:descerrorips = 'DATO NO CORRESPONDE A ' & CLIP(DPR:RazonSocial)
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          END
+          if clip(RIPS_AF:NOMBREENTIDADM) = ''
+             glo:TABLA       = 'AF'
+             glo:CAMPO       = 'NOMBREENTIDAD'
+             glo:REGISTRO    = LOC:NUMREG
+             glo:descerrorips = 'DATO NO EXISTE'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          if clip(RIPS_AF:VALORNETO) = ''
+             glo:TABLA       = 'AF'
+             glo:CAMPO       = 'VALORNETO'
+             glo:REGISTRO    = LOC:NUMREG
+             glo:descerrorips = 'DATO NO EXISTE'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          if clip(RIPS_AF:VALORNETO) = 0
+             glo:TABLA       = 'AF'
+             glo:CAMPO       = 'VALORNETO'
+             glo:REGISTRO    = LOC:NUMREG
+             glo:descerrorips = 'VALOR NETO A PAGAR EN 0'
+             ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             LOC:ERROR = 1
+          end
+          LOC:NFAC = RIPS_AF:NUMFACTURA
+          ADD(LOC:FACTURAS,+LOC:NFAC)
+          LOC:NUMREG += 1
+       end
+       LOOP I# = 1 TO LOC:NR_COLA
+          GET(LOC:TOTALRIPS,I#)
+          IF LOC:ARCHIVO = 'AF'
+             IF loc:registros <> LOC:NUMREG - 1
+                glo:TABLA       = 'AF'
+                glo:CAMPO       = 0
+                glo:REGISTRO    = 0
+                glo:descerrorips = 'NUMERO DE REGISTROS DEL ARCHIVO DE CONTROL NO COINCIDE CON EL ARCHIVO (' & LOC:REGISTROS & '-' & LOC:NUMREG & ')'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                LOC:ERROR = 1
+             END
+          END
+       END
+    end
+    IF LOC:ERROR = 1
+       if glo:validartodo = 1
+          message('ERRORES EN ARCHIVO DE FACTURACION'&chr(13)&|
+                  'Sin embargo se continua la validación de otros archivos,'&chr(13)&|
+                  'Por estar marcada la opción Validar todo','RIPS', ICON:HAND)
+          LOC:ERROR = 0
+       else
+          glo:TABLA       = 'AF'
+          glo:CAMPO       = 0
+          glo:REGISTRO    = 999
+          glo:descerrorips = ''
+          ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+          glo:TABLA       = 'AF'
+          glo:CAMPO       = 0
+          glo:REGISTRO    = 999
+          glo:descerrorips = 'ERRORES EN ARCHIVO DE FACTURACION - SE DETIENE LA VERIFICACION DE LOS OTROS ARCHIVOS'
+          ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+       END
+    END
+    IF LOC:ERROR = 0
+          if glo:n_ac = 1
+          loc:mensaje = 'VALIDANDO Archivo de Consultas'
+          display
+          LOC:NUMREG = 1
+          clear(rips_ac:record,-1)
+          set(rips_ac)
+          loop until access:RIPS_AC.next()
+             if clip(RIPS_AC:NUMFACTURA) = ''
+                glo:TABLA       = 'AC' ;   glo:CAMPO       = 'NUMFACTURA'
+                glo:REGISTRO    = LOC:NUMREG ;  glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NFAC = RIPS_AC:NUMFACTURA
+             GET(LOC:FACTURAS,+LOC:NFAC)
+             IF ERRORCODE()
+                glo:TABLA       = 'AC' ;  glo:CAMPO = 'NUMFACTURA' ;  glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'NUMERO DE FACTURA NO EXISTE EN ARCHIVO DE FACTURAS - AF -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AC:IDPRESTADOR) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'IDPRESTADOR'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AC:TIPO_DOC) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'TIPODOC'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AC:IDUSUARIO) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'IDUSUARIO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:ID = RIPS_AC:IDUSUARIO
+             GET(LOC:USUARIOS,+LOC:ID)
+             IF ERRORCODE()
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'IDUSUARIO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'IDENTIFICACION DE USUARIO NO EXISTE EN ARCHIVO DE USUARIOS - US -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AC:FECHACONSULTA) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'FECHACONSULTA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:RF = 0
+             LOC:DIA = SUB(RIPS_AC:FECHACONSULTA,1,2)
+             LOC:SEP1 = SUB(RIPS_AC:FECHACONSULTA,3,1)
+             LOC:MES = SUB(RIPS_AC:FECHACONSULTA,4,2)
+             LOC:SEP2 = SUB(RIPS_AC:FECHACONSULTA,6,1)
+             LOC:ANO = SUB(RIPS_AC:FECHACONSULTA,7,4)
+             IF LOC:SEP1 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:SEP2 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:DIA < 1 OR LOC:DIA > 31
+                LOC:RF = 1
+             END
+             IF LOC:MES < 1 OR LOC:MES > 12
+                LOC:RF = 1
+             END
+             IF LOC:RF = 1
+                glo:tabla       = 'AC'
+                glo:campo       = 'FECHACONSULTA'
+                glo:registro    = LOC:NUMREG
+                glo:descerrorips = 'FECHA INVALIDA'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                loc:error = 1
+             END
+             if clip(RIPS_AC:IDCONSULTA) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'IDCONSULTA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AC:FINCONSULTA) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'FINCONSULTA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AC:CAUSAEXT) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'CAUSAEXTERNA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AC:IDDXPPAL) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'DIAGNOSTICO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             else
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AC:IDDXPPAL
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AC'
+                   glo:CAMPO       = 'DIAGNOSTICO'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             end
+             IF CLIP(RIPS_AC:IDDXREL1) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AC:IDDXREL1
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AC'
+                   glo:CAMPO       = 'DIAGNOSTICO'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             IF CLIP(RIPS_AC:IDDXREL2) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AC:IDDXREL2
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AC'
+                   glo:CAMPO       = 'DIAGNOSTICO'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             IF CLIP(RIPS_AC:IDDXREL3) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AC:IDDXREL3
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AC'
+                   glo:CAMPO       = 'DIAGNOSTICO'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             if clip(RIPS_AC:TIPODX) = ''
+                glo:TABLA       = 'AC'
+                glo:CAMPO       = 'TIPODIAG'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NUMREG += 1
+
+          end
+          LOOP I# = 1 TO LOC:NR_COLA
+             GET(LOC:TOTALRIPS,I#)
+             IF LOC:ARCHIVO = 'AC'
+                IF loc:registros <> LOC:NUMREG - 1
+                   glo:TABLA       = 'AC'
+                   glo:CAMPO       = 0
+                   glo:REGISTRO    = 0
+                   glo:descerrorips = 'NUMERO DE REGISTROS DEL ARCHIVO DE CONTROL NO COINCIDE CON EL ARCHIVO (' & LOC:REGISTROS & '-' & LOC:NUMREG & ')'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                END
+             END
+          END
+       end
+       if glo:n_ad = 1
+          loc:mensaje = 'VALIDANDO Archivo de Descripción'
+          display
+          LOC:NUMREG = 1
+          clear(rips_ad:record,-1)
+          set(rips_ad)
+          loop until access:rips_ad.next()
+             if clip(RIPS_AD:NUMFACTURA) = ''
+                glo:TABLA       = 'AD'
+                glo:CAMPO       = 'NUMFACTURA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NFAC = RIPS_AD:NUMFACTURA
+             GET(LOC:FACTURAS,+LOC:NFAC)
+             IF ERRORCODE()
+                glo:TABLA       = 'AD'
+                glo:CAMPO       = 'NUMFACTURA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'NUMERO DE FACTURA NO EXISTE EN ARCHIVO DE FACTURAS - AF -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AD:IDPRESTADOR) = ''
+                glo:TABLA       = 'AD'
+                glo:CAMPO       = 'IDPRESTADOR'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AD:CODCONCEPTO) = ''
+                glo:TABLA       = 'AD'
+                glo:CAMPO       = 'CODCONCEPTO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AD:CANTIDAD) = ''
+                glo:TABLA       = 'AD'
+                glo:CAMPO       = 'CANTIDAD'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AD:TOTALCONCEPTO) = ''
+                glo:TABLA       = 'AD'
+                glo:CAMPO       = 'TOTALCONCEPTO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NUMREG += 1
+          end
+          LOOP I# = 1 TO LOC:NR_COLA
+             GET(LOC:TOTALRIPS,I#)
+             IF LOC:ARCHIVO = 'AD'
+                IF loc:registros <> LOC:NUMREG- 1
+                   glo:TABLA       = 'AD'
+                   glo:CAMPO       = 0
+                   glo:REGISTRO    = 0
+                   glo:descerrorips = 'NUMERO DE REGISTROS DEL ARCHIVO DE CONTROL NO COINCIDE CON EL ARCHIVO (' & LOC:REGISTROS & '-' & LOC:NUMREG & ')'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                END
+             END
+          END
+       end
+       if glo:n_aH = 1
+          loc:mensaje = 'VALIDANDO Archivo de Hospitalización'
+          display
+          LOC:NUMREG = 1
+          clear(rips_aH:record,-1)
+          set(rips_aH)
+          loop until access:rips_aH.next()
+             if clip(RIPS_AH:NUMFACTURA) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'NUMFACTURA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NFAC = RIPS_AH:NUMFACTURA
+             GET(LOC:FACTURAS,+LOC:NFAC)
+             IF ERRORCODE()
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'NUMFACTURA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'NUMERO DE FACTURA NO EXISTE EN ARCHIVO DE FACTURAS - AF -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AH:IDPRESTADOR) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'IDPRESTADOR'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AH:TIPO_DOC) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'TIPODOCUMENTO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AH:IDUSUARIO) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'IDUSUARIO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:ID = RIPS_AH:IDUSUARIO
+             GET(LOC:USUARIOS,+LOC:ID)
+             IF ERRORCODE()
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'IDUSUARIO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'IDENTIFICACION DE USUARIO NO EXISTE EN ARCHIVO DE USUARIOS - US -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AH:VIAINGRESO) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'VIADEINGRESO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AH:FECHAINGRESO) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'FECHAINGRESO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:RF = 0
+             LOC:DIA = SUB(RIPS_AH:FECHAINGRESO,1,2)
+             LOC:SEP1 = SUB(RIPS_AH:FECHAINGRESO,3,1)
+             LOC:MES = SUB(RIPS_AH:FECHAINGRESO,4,2)
+             LOC:SEP2 = SUB(RIPS_AH:FECHAINGRESO,6,1)
+             LOC:ANO = SUB(RIPS_AH:FECHAINGRESO,7,4)
+             IF LOC:SEP1 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:SEP2 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:DIA < 1 OR LOC:DIA > 31
+                LOC:RF = 1
+             END
+             IF LOC:MES < 1 OR LOC:MES > 12
+                LOC:RF = 1
+             END
+             IF LOC:RF = 1
+                glo:tabla       = 'AH'
+                glo:campo       = 'FECHAINGRESO'
+                glo:registro    = LOC:NUMREG
+                glo:descerrorips = 'FECHA INVALIDA'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                loc:error = 1
+             END
+             if clip(RIPS_AH:HORAINGRESO) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'HORAINGRESO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AH:CAUSAEXT) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'CAUSAEXTERNA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AH:DXINGRESO) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'DIAGNOSTICOING'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             else
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AH:DXINGRESO
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AH'
+                   glo:CAMPO       = 'DIAGNOSTICOING'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             end
+             if clip(RIPS_AH:DXEGRESO) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'DIAGNOSTICOEGRE'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             else
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AH:DXEGRESO
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AH'
+                   glo:CAMPO       = 'DIAGNOSTICOEGRE'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             end
+             IF CLIP(RIPS_AH:DXREL1) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AH:DXREL1
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AH'
+                   glo:CAMPO       = 'DXRELACIONADO1'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+
+             END
+             IF CLIP(RIPS_AH:DXREL2) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AH:DXREL2
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AH'
+                   glo:CAMPO       = 'DXRELACIONADO2'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             IF CLIP(RIPS_AH:DXREL3) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AH:DXREL3
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AH'
+                   glo:CAMPO       = 'DXRELACIONADO3'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             IF CLIP(RIPS_AH:DXCOMP) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AH:DXCOMP
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AH'
+                   glo:CAMPO       = 'DXCOMPLICACION'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             if clip(RIPS_AH:ESTSALIDA) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'ESTADOSALIDA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AH:FECHAEGRESO) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'FECHAEGRESO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:RF = 0
+             LOC:DIA = SUB(RIPS_AH:FECHAEGRESO,1,2)
+             LOC:SEP1 = SUB(RIPS_AH:FECHAEGRESO,3,1)
+             LOC:MES = SUB(RIPS_AH:FECHAEGRESO,4,2)
+             LOC:SEP2 = SUB(RIPS_AH:FECHAEGRESO,6,1)
+             LOC:ANO = SUB(RIPS_AH:FECHAEGRESO,7,4)
+             IF LOC:SEP1 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:SEP2 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:DIA < 1 OR LOC:DIA > 31
+                LOC:RF = 1
+             END
+             IF LOC:MES < 1 OR LOC:MES > 12
+                LOC:RF = 1
+             END
+             IF LOC:RF = 1
+                glo:tabla       = 'AH'
+                glo:campo       = 'FECHAEGRESO'
+                glo:registro    = LOC:NUMREG
+                glo:descerrorips = 'FECHA INVALIDA'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                loc:error = 1
+             END
+             if clip(RIPS_AH:HORAEGRESO) = ''
+                glo:TABLA       = 'AH'
+                glo:CAMPO       = 'HORAEGRESO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NUMREG += 1
+          END
+          LOOP I# = 1 TO LOC:NR_COLA
+             GET(LOC:TOTALRIPS,I#)
+             IF LOC:ARCHIVO = 'AH'
+                IF loc:registros <> LOC:NUMREG - 1
+                   glo:TABLA       = 'AH'
+                   glo:CAMPO       = 0
+                   glo:REGISTRO    = 0
+                   glo:descerrorips = 'NUMERO DE REGISTROS DEL ARCHIVO DE CONTROL NO COINCIDE CON EL ARCHIVO (' & LOC:REGISTROS & '-' & LOC:NUMREG & ')'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                END
+             END
+          END
+       END
+       if glo:n_aP = 1
+          loc:mensaje = 'VALIDANDO Archivo de Procedimientos'
+          display
+          LOC:NUMREG = 1
+          clear(rips_ap:record,-1)
+          set(rips_ap)
+          loop until access:rips_ap.next()
+             if clip(RIPS_AP:IDPRESTADOR) = ''
+                glo:TABLA       = 'AP'
+                glo:CAMPO       = 'IDPRESTADOR'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AP:TIPO_DOC) = ''
+                glo:TABLA       = 'AP'
+                glo:CAMPO       = 'TIPODOCUMENTO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AP:IDUSUARIO) = ''
+                glo:TABLA       = 'AP'
+                glo:CAMPO       = 'IDUSUARIO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:ID = RIPS_AP:IDUSUARIO
+             GET(LOC:USUARIOS,+LOC:ID)
+             IF ERRORCODE()
+                glo:TABLA       = 'AP'
+                glo:CAMPO       = 'IDUSUARIO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'IDENTIFICACION DE USUARIO NO EXISTE EN ARCHIVO DE USUARIOS - US -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AP:FECHAPROCEDIMIENTO) = ''
+                glo:TABLA       = 'AP'
+                glo:CAMPO       = 'FECHAPROCED'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:RF = 0
+             LOC:DIA = SUB(RIPS_AP:FECHAPROCEDIMIENTO,1,2)
+             LOC:SEP1 = SUB(RIPS_AP:FECHAPROCEDIMIENTO,3,1)
+             LOC:MES = SUB(RIPS_AP:FECHAPROCEDIMIENTO,4,2)
+             LOC:SEP2 = SUB(RIPS_AP:FECHAPROCEDIMIENTO,6,1)
+             LOC:ANO = SUB(RIPS_AP:FECHAPROCEDIMIENTO,7,4)
+             IF LOC:SEP1 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:SEP2 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:DIA < 1 OR LOC:DIA > 31
+                LOC:RF = 1
+             END
+             IF LOC:MES < 1 OR LOC:MES > 12
+                LOC:RF = 1
+             END
+             IF LOC:RF = 1
+                glo:tabla       = 'AP'
+                glo:campo       = 'FECHAPROCEDIMIENTO'
+                glo:registro    = LOC:NUMREG
+                glo:descerrorips = 'FECHA INVALIDA'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                loc:error = 1
+             END
+             if clip(RIPS_AP:IDPROCEDIMIENTO) = ''
+                glo:TABLA       = 'AP'
+                glo:CAMPO       = 'IDPROCEDIMIENTO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AP:AMBITO) = ''
+                glo:TABLA       = 'AP'
+                glo:CAMPO       = 'AMBITO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AP:FINPROCEDIMIENTO) = ''
+                glo:TABLA       = 'AP'
+                glo:CAMPO       = 'FINPROCEDIM'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             IF CLIP(RIPS_AP:DXPPAL) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AP:DXPPAL
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AP'
+                   glo:CAMPO       = 'DXPRINCIPAL'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             IF CLIP(RIPS_AP:DXREL) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AP:DXREL
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AP'
+                   glo:CAMPO       = 'DXRELACIONADO'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             IF CLIP(RIPS_AP:COMPLICACION) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AP:COMPLICACION
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AP'
+                   glo:CAMPO       = 'DXCOMPLICACION'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+
+             LOC:NUMREG += 1
+          END
+          LOOP I# = 1 TO LOC:NR_COLA
+             GET(LOC:TOTALRIPS,I#)
+             IF LOC:ARCHIVO = 'AP'
+                IF loc:registros <> LOC:NUMREG - 1
+                   glo:TABLA       = 'AP'
+                   glo:CAMPO       = 0
+                   glo:REGISTRO    = 0
+                   glo:descerrorips = 'NUMERO DE REGISTROS DEL ARCHIVO DE CONTROL NO COINCIDE CON EL ARCHIVO (' & LOC:REGISTROS & '-' & LOC:NUMREG & ')'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                END
+             END
+          END
+       END
+       if glo:n_au = 1
+          loc:mensaje = 'VALIDANDO Archivo de Urgencias'
+          display
+          LOC:NUMREG = 1
+          clear(rips_au:record,-1)
+          set(rips_au)
+          loop until access:rips_au.next()
+             if clip(RIPS_AU:NUMFACTURA) = ''
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'NUMFACTURA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NFAC = RIPS_AU:NUMFACTURA
+             GET(LOC:FACTURAS,+LOC:NFAC)
+             IF ERRORCODE()
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'NUMFACTURA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'NUMERO DE FACTURA NO EXISTE EN ARCHIVO DE FACTURAS - AF -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AU:IDPRESTADOR) = ''
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'IDPRESTADOR'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AU:TIPO_DOC) = ''
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'TIPODOCUMENTO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AU:IDUSUARIO) = ''
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'IDUSUARIO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:ID = RIPS_AU:IDUSUARIO
+             GET(LOC:USUARIOS,+LOC:ID)
+             IF ERRORCODE()
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'IDUSUARIO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'IDENTIFICACION DE USUARIO NO EXISTE EN ARCHIVO DE USUARIOS - US -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AU:FECHAINGRESO) = ''
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'FECHAINGRESO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:RF = 0
+             LOC:DIA = SUB(RIPS_AU:FECHAINGRESO,1,2)
+             LOC:SEP1 = SUB(RIPS_AU:FECHAINGRESO,3,1)
+             LOC:MES = SUB(RIPS_AU:FECHAINGRESO,4,2)
+             LOC:SEP2 = SUB(RIPS_AU:FECHAINGRESO,6,1)
+             LOC:ANO = SUB(RIPS_AU:FECHAINGRESO,7,4)
+             IF LOC:SEP1 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:SEP2 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:DIA < 1 OR LOC:DIA > 31
+                LOC:RF = 1
+             END
+             IF LOC:MES < 1 OR LOC:MES > 12
+                LOC:RF = 1
+             END
+             IF LOC:RF = 1
+                glo:tabla       = 'AU'
+                glo:campo       = 'FECHAINGRESO'
+                glo:registro    = LOC:NUMREG
+                glo:descerrorips = 'FECHA INVALIDA'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                loc:error = 1
+             END
+             if clip(RIPS_AU:HORAINGRESO) = ''
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'HORAINGRESO'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AU:CAUSAEXT) = ''
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'CAUSAEXTERNA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AU:DXSALIDA) = ''
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'DIAGN.SALIDA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             ELSE
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AU:DXSALIDA
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AP'
+                   glo:CAMPO       = 'DXSALIDA'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             end
+             IF CLIP(RIPS_AU:IDDXREL1) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AU:IDDXREL1
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AP'
+                   glo:CAMPO       = 'DXRELACIONADO1'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             IF CLIP(RIPS_AU:IDDXREL2) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AU:IDDXREL2
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AP'
+                   glo:CAMPO       = 'DXRELACIONADO2'
+                   glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             IF CLIP(RIPS_AU:IDDXREL3) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AU:IDDXREL3
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AP' ; glo:CAMPO       = 'DXRELACIONADO3' ; glo:REGISTRO    = LOC:NUMREG
+                   glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             IF CLIP(RIPS_AU:CBMU) <> ''
+                clear(mdx:record)
+                MDX:IDDX = RIPS_AU:CBMU
+                if access:mdx.tryfetch(MDX:MDXIDDX)
+                   glo:TABLA       = 'AP' ; glo:CAMPO = 'CAUSABASMUERTE'; glo:REGISTRO    = LOC:NUMREG; glo:descerrorips = 'NO VALIDO'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                end
+             END
+             if clip(RIPS_AU:DESTINOSALIDA) = ''
+                glo:TABLA       = 'AU' ; glo:CAMPO       = 'DESTINOSALIDA' ; glo:REGISTRO    = LOC:NUMREG ; glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AU:ESTSALIDA) = ''
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'ESTADOSALIDA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AU:FECHASALIDA) = ''
+                glo:TABLA       = 'AU'
+                glo:CAMPO       = 'FECHASALIDA'
+                glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:RF = 0
+             LOC:DIA = SUB(RIPS_AU:FECHASALIDA,1,2)
+             LOC:SEP1 = SUB(RIPS_AU:FECHASALIDA,3,1)
+             LOC:MES = SUB(RIPS_AU:FECHASALIDA,4,2)
+             LOC:SEP2 = SUB(RIPS_AU:FECHASALIDA,6,1)
+             LOC:ANO = SUB(RIPS_AU:FECHASALIDA,7,4)
+             IF LOC:SEP1 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:SEP2 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:DIA < 1 OR LOC:DIA > 31
+                LOC:RF = 1
+             END
+             IF LOC:MES < 1 OR LOC:MES > 12
+                LOC:RF = 1
+             END
+             IF LOC:RF = 1
+                glo:tabla       = 'AU' ; glo:campo       = 'FECHASALIDA' ; glo:registro    = LOC:NUMREG ; glo:descerrorips = 'FECHA INVALIDA'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                loc:error = 1
+             END
+             if clip(RIPS_AU:HORASALIDA) = ''
+                glo:TABLA       = 'AU' ; glo:CAMPO       = 'HORASALIDA'; glo:REGISTRO    = LOC:NUMREG; glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NUMREG += 1
+          end
+          LOOP I# = 1 TO LOC:NR_COLA
+             GET(LOC:TOTALRIPS,I#)
+             IF LOC:ARCHIVO = 'AU'
+                IF loc:registros <> LOC:NUMREG - 1
+                   glo:TABLA       = 'AU' ; glo:CAMPO       = 0 ; glo:REGISTRO    = 0
+                   glo:descerrorips = 'NUMERO DE REGISTROS DEL ARCHIVO DE CONTROL NO COINCIDE CON EL ARCHIVO (' & LOC:REGISTROS & '-' & LOC:NUMREG & ')'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                END
+             END
+          END
+       end
+       if glo:n_am = 1
+          loc:mensaje = 'VALIDANDO Archivo de Medicamentos'
+          display
+          LOC:NUMREG = 1
+          clear(rips_am:record,-1)
+          set(rips_am)
+          loop until access:rips_am.next()
+             if clip(RIPS_AM:NUMFACTURA) = ''
+                glo:TABLA  = 'AM' ; glo:CAMPO = 'NUMFACTURA'; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NFAC = RIPS_AM:NUMFACTURA
+             GET(LOC:FACTURAS,+LOC:NFAC)
+             IF ERRORCODE()
+                glo:TABLA = 'AM' ; glo:CAMPO = 'NUMFACTURA' ; glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'NUMERO DE FACTURA NO EXISTE EN ARCHIVO DE FACTURAS - AF -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AM:IDPRESTADOR) = ''
+                glo:TABLA = 'AM' ; glo:CAMPO = 'IDPRESTADOR' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AM:TIPO_DOC) = ''
+                glo:TABLA = 'AM' ; glo:CAMPO = 'TIPODOC' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AM:IDUSUARIO) = ''
+                glo:TABLA       = 'AM' ; glo:CAMPO  = 'IDUSUARIO' ; glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:ID = RIPS_AM:IDUSUARIO
+             GET(LOC:USUARIOS,+LOC:ID)
+             IF ERRORCODE()
+                glo:TABLA       = 'AM' ; glo:CAMPO = 'IDUSUARIO' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'IDENTIFICACION DE USUARIO NO EXISTE EN ARCHIVO DE USUARIOS - US -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AM:TIPOMEDICAMENTO) = ''
+                glo:TABLA       = 'AM' ; glo:CAMPO  = 'TIPOMEDICAMENTO' ; glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AM:NUMUNIDADES) = ''
+                glo:TABLA       = 'AM' ; glo:CAMPO = 'NUMUNIDADES' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NUMREG += 1
+          end
+          LOOP I# = 1 TO LOC:NR_COLA
+             GET(LOC:TOTALRIPS,I#)
+             IF LOC:ARCHIVO = 'AM'
+                IF loc:registros <> LOC:NUMREG - 1
+                   glo:TABLA       = 'AM'
+                   glo:CAMPO       = 0
+                   glo:REGISTRO    = 0
+                   glo:descerrorips = 'NUMERO DE REGISTROS DEL ARCHIVO DE CONTROL NO COINCIDE CON EL ARCHIVO (' & LOC:REGISTROS & '-' & LOC:NUMREG & ')'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                END
+             END
+          END
+       end
+       if glo:n_an = 1
+          loc:mensaje = 'VALIDANDO Archivo de Recien Nacidos'
+          display
+          LOC:NUMREG = 1
+          clear(rips_an:record,-1)
+          set(rips_an)
+          loop until access:rips_an.next()
+             if clip(RIPS_AN:NUMFACTURA) = ''
+                glo:TABLA = 'AN' ; glo:CAMPO = 'NUMFACTURA' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NFAC = RIPS_AN:NUMFACTURA
+             GET(LOC:FACTURAS,+LOC:NFAC)
+             IF ERRORCODE()
+                glo:TABLA       = 'AN' ; glo:CAMPO = 'NUMFACTURA' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'NUMERO DE FACTURA NO EXISTE EN ARCHIVO DE FACTURAS - AF -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AN:IDPRESTADOR) = ''
+                glo:TABLA = 'AN' ; glo:CAMPO = 'IDPRESTADOR' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AN:TIPOIDM) = ''
+                glo:TABLA       = 'AN' ;  glo:CAMPO = 'TIPOIDM' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AN:IDMADRE) = ''
+                glo:TABLA = 'AN' ; glo:CAMPO = 'IDMADRE' ; glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AN:FNACIMIENTO) = ''
+                glo:TABLA = 'AN' ; glo:CAMPO = 'FECHANACIMIENTO' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:RF = 0
+             LOC:DIA = SUB(RIPS_AN:FNACIMIENTO,1,2)
+             LOC:SEP1 = SUB(RIPS_AN:FNACIMIENTO,3,1)
+             LOC:MES = SUB(RIPS_AN:FNACIMIENTO,4,2)
+             LOC:SEP2 = SUB(RIPS_AN:FNACIMIENTO,6,1)
+             LOC:ANO = SUB(RIPS_AN:FNACIMIENTO,7,4)
+             IF LOC:SEP1 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:SEP2 <> '/'
+                LOC:RF = 1
+             END
+             IF LOC:DIA < 1 OR LOC:DIA > 31
+                LOC:RF = 1
+             END
+             IF LOC:MES < 1 OR LOC:MES > 12
+                LOC:RF = 1
+             END
+             IF LOC:RF = 1
+                glo:tabla = 'AN' ; glo:campo = 'FECHANACIMIENTO' ; glo:registro = LOC:NUMREG
+                glo:descerrorips = 'FECHA INVALIDA'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                loc:error = 1
+             END
+             if clip(RIPS_AN:HNACIMIENTO) = ''
+                glo:TABLA       = 'AN' ; glo:CAMPO       = 'HORANACIMIENTO'; glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AN:EDADGEST) = ''
+                glo:TABLA       = 'AN' ; glo:CAMPO = 'EDADGEST' ; glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AN:CPRENATAL) = ''
+                glo:TABLA       = 'AN' ; glo:CAMPO       = 'CPRENATAL' ; glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AN:SEXO) = ''
+                glo:TABLA       = 'AN' ;  glo:CAMPO       = 'SEXO' ; glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AN:PESO) = ''
+                glo:TABLA       = 'AN' ; glo:CAMPO       = 'PESO' ;  glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AN:DXRN) = ''
+                glo:TABLA       = 'AN' ; glo:CAMPO = 'DIAGNOSRECIENNAC' ; glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NUMREG += 1
+          end
+          LOOP I# = 1 TO LOC:NR_COLA
+             GET(LOC:TOTALRIPS,I#)
+             IF LOC:ARCHIVO = 'AN'
+                IF loc:registros <> LOC:NUMREG - 1
+                   glo:TABLA       = 'AN' ; glo:CAMPO = 0 ; glo:REGISTRO    = 0
+                   glo:descerrorips = 'NUMERO DE REGISTROS DEL ARCHIVO DE CONTROL NO COINCIDE CON EL ARCHIVO (' & LOC:REGISTROS & '-' & LOC:NUMREG & ')'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                END
+             END
+          END
+       end
+       if glo:n_at = 1
+          loc:mensaje = 'VALIDANDO Archivo de Otros Servicios'
+          display
+          LOC:NUMREG = 1
+          clear(rips_at:record,-1)
+          set(rips_at)
+          loop until access:rips_at.next()
+             if clip(RIPS_AT:NUMFACTURA) = ''
+                glo:TABLA       = 'AT' ; glo:CAMPO  = 'NUMFACTURA' ;  glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NFAC = RIPS_AT:NUMFACTURA
+             GET(LOC:FACTURAS,+LOC:NFAC)
+             IF ERRORCODE()
+                glo:TABLA       = 'AT' ;  glo:CAMPO = 'NUMFACTURA' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'NUMERO DE FACTURA NO EXISTE EN ARCHIVO DE FACTURAS - AF -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AT:IDPRESTADOR) = ''
+                glo:TABLA       = 'AT' ;  glo:CAMPO       = 'IDPRESTADOR'
+                glo:REGISTRO    = LOC:NUMREG ;   glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AT:TIPO_DOC) = ''
+                glo:TABLA       = 'AT' ;  glo:CAMPO       = 'TIPODOC'
+                glo:REGISTRO    = LOC:NUMREG ; glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AT:IDUSUARIO) = ''
+                glo:TABLA       = 'AT' ;   glo:CAMPO       = 'IDUSUARIO'
+                glo:REGISTRO    = LOC:NUMREG ;  glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:ID = RIPS_AT:IDUSUARIO
+             GET(LOC:USUARIOS,+LOC:ID)
+             IF ERRORCODE()
+                glo:TABLA       = 'AT' ;  glo:CAMPO       = 'IDUSUARIO' ; glo:REGISTRO    = LOC:NUMREG
+                glo:descerrorips = 'IDENTIFICACION DE USUARIO NO EXISTE EN ARCHIVO DE USUARIOS - US -'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             END
+             if clip(RIPS_AT:TIPOSERVICIO) = ''
+                glo:TABLA       = 'AT' ; glo:CAMPO = 'TIPOSERVICIO' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             if clip(RIPS_AT:CANTIDAD) = ''
+                glo:TABLA       = 'AT' ; glo:CAMPO = 'CANTIDAD' ; glo:REGISTRO = LOC:NUMREG
+                glo:descerrorips = 'DATO NO EXISTE'
+                ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+             end
+             LOC:NUMREG += 1
+          end
+          LOOP I# = 1 TO LOC:NR_COLA
+             GET(LOC:TOTALRIPS,I#)
+             IF LOC:ARCHIVO = 'AT'
+                IF loc:registros <> LOC:NUMREG - 1
+                   glo:TABLA       = 'AT' ; glo:CAMPO       = 0 ; glo:REGISTRO    = 0
+                   glo:descerrorips = 'NUMERO DE REGISTROS DEL ARCHIVO DE CONTROL NO COINCIDE CON EL ARCHIVO (' & LOC:REGISTROS & '-' & LOC:NUMREG & ')'
+                   ADD(glo:errorips,+glo:tabla,+glo:registro,+glo:campo)
+                END
+             END
+          END
+       end
+    END
+ END
+ loc:total = records(glo:errorips)
+ if loc:total > 0
+    Message('Validación Terminada','RIPS',icon:hand)
+    win:Muestra_Errores_LCM
+ else
+    Message('Envio de RIPS Correcto')
+ end
+ POST(EVENT:CLOSEWINDOW)

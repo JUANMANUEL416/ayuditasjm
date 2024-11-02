@@ -1,0 +1,36 @@
+1-DESCARGA DE APP SOAPUI  OPENSOURCE
+a.Instalarlo en su pc
+
+2.Creacion de Proyecto
+a. Crear un nuevo Proyecto con el nombre que deseen(En lo preferible "Facturacion Electronica")
+b. En el campo de Initial WSDL pegar lo siguiente "https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl" (sin comillas)
+c. Verificar que el campo Create Request este marcado y darle click en OK
+
+3.Asociar la clave o firma digital
+a.Al crear el proyecto a mano izquierda mostrara dicho proyecto con el nombre definido, dar doble click al nombre del proyecto y este abrira una pestaña 
+  en la cual damos click en pestaña de WS-Security Configurations, en sub pestaña seleccionar pestaña Keystores le damos en + y escoger la firma, 
+  despues escribir la clave de la firma, si todo esta bien el campo de status debe decir "OK"
+b.En misma subpestaña ir a Outgoing WS-Security Configurations, en parte superior crear con nombre que desee (En lo preferible "outgoing")
+c.Despues de creado el outgoing lo seleccionamos y en la parte inferior izquierda agregar nuevo registro tipo Signature
+d.Al crearlo llenar los campos de mano derecha,
+  Keystore: Firma asociada
+  Alias   : 1
+  Password: Clave de firma asociada
+  Key Identifier type: Binary Security Token
+  Signature Algorithm: http://www.w3.org/2001/04/xmldsig-more#rsa-sha256
+  Signature Canonicalization: http://www.w3.org/2001/10/xml-exc-c14n#
+  Digest Algorithm:   http://www.w3.org/2001/04/xmlenc#sha256
+  Use Single Certificate: activo
+  Prepend Signature Element: Activo
+
+  Parts: agregar uno nuevo ID puede quedar Vacio, Name=To, Namespace=http://www.w3.org/2005/08/addressing , Encode=Element
+
+e.Agregar un nuevo registro tipo Timestamp y en la parte derecha llenar con cantidad 60000
+
+4.Configuracion de GetNumberingRange
+a. En el menu del proyecto seleccionar GetNumberingRange-Request1 dando doble click al ultimo
+b. al abrirlo en la parte inferior seleccion Auth en campo Authorization-Add New Authorization, preguntara por tipo seleccionar basic
+c. Despues de seleccionado en Outgoing WSS: seleccionar el outgoing que se creo previamente en el punto: 3.b
+d  Seleccionar siguiente campo u pestaña WS-A en esta pestaña marcar check: Add default wsa: To
+e. Por ultimo en el texto de parte superior llenar los 3 campos que tienen signo de interrogacion, Los dos primeros con el nit del cliente y el ultimo con el ID del software
+f. Cuando este se encuentre lleno dar click en boton de play (Color verde), y a  mano derecha aparecera listado de resoluciones activas para el cliente con su respectiva llave tecnica

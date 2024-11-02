@@ -1,0 +1,32 @@
+CLEAR(IMOVH:RECORD,-1)
+IMOVH:CNSMOV = LOC:XXXXXXXXXX
+SET(IMOVH:IMOVHCNSMOVXXXX,IMOVH:IMOVHCNSMOVXXXX)
+LOOP UNTIL ACCESS:IMOVH.NEXT()
+   IF IMOVH:CNSMOV <> LOC:XXXXXXXXXX THEN BREAK.
+   ....
+   CÓDIGO
+   ....
+END
+LINKS DE DESCARGA:
+
+https://drive.google.com/uc?id=1E8prplari1xrx3HV5kSFS33eTTuS-gr0&export=download-- VENGADORES EN HD
+https://pelispormega.ml/movies/vengadores-infinity-war/
+
+https://descargarpackcppormega.blogspot.com/?zx=6fec25a4e324fe00
+
+Descargar Utorrent para PC
+--https://mega.nz/#F!G2AQAQxZ!wORI1PSJb5FuaRUOsl3qfA
+https://mega.nz/#F!bnxQzQaJ!mgSd2NBFfWymWsZ5iCiPlw!Hup03KCQ
+
+https://www.utorrent.com/intl/es/downloads/win
+03F|03B|03C|03CA|03F|04A|05
+
+         EXEC SPK_GENCONSECUTIVO @COMPANIA, @SEDE, '@LOG',  @NVOCONSEC OUTPUT  
+         SELECT @NVOCONSEC = @SEDE + REPLACE(SPACE(8 - LEN(@NVOCONSEC))+LTRIM(RTRIM(@NVOCONSEC)),SPACE(1),0)
+         
+            -- el log debe mirarse donde apunta bdix revisar
+         INSERT INTO USLOG (CNSLOG, COMPANIA, NOADMISION, PROCESO, REQUEST, REFERENCIA, USUARIO, FECHA, SYS_ComputerName) 
+         SELECT @NVOCONSEC, @COMPANIA, @N_FACTURA, 'LIBERARFAC', 'PROCESS', @RAZONCAMBIO, @USUARIO, 
+                  DBO.FNK_FECHA_SIN_MLS(GETDATE()), @SYS_COMPUTERNAME          
+         INSERT INTO USLOGH( CNSLOG, ITEM, CAMPO, VALORANT, VALORNVO)
+         SELECT @NVOCONSEC, 1, 'USU SOLICITA', @USUARIO2, NULL

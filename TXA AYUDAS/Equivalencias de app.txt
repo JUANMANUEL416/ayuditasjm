@@ -1,0 +1,132 @@
+kix   ; SMdct  --;X;y
+kfn0  ; SMfun0 --;X;y
+kge0  ; SMger0 --;X;y
+kgn0  ; SMgen0 --  X;y
+kgn9  ; SMgen9 --  X;y
+kgn3  ; SMgen3 --  X;y
+kic0  ; SMci0  --  X;y
+kic1  ; SMci1  --;x;y
+kcg0  ; SMcg0  --;x;y
+khge0 ; SMch0  --  x;y
+kycg0 ; SMcg1  --  x;y
+kcs0  ; SMcs0  --  x;y
+klb0  ; SMlb0  --  x;y
+kcs5  ; SMcs5  --  x;y
+kaip0 ; SMaf0  --  x   y
+kdocxtpo SMdc0 --   x;y
+kico0    SMci2 --   x;y
+ksy0     SMcf0 --   x;y
+kcs3     SMcs3 --   x;y
+kseg     SMseg --   x;y
+ksoat    SMsoa --  x;y
+kaut01   SMaut --  x;y
+khrl0    SMre0 --  x;y
+ktria    SMtri --  x;y
+khad0    SMadm0 -- x;y
+kpre0    SMcar0  --;x;y
+kcs7     SMcs7   -- x;y
+kihc3    SMhci3  -- x;y
+kft0     SMfac0  -- x;y
+kcau0    SMaut2  --;x;y
+khcd0    SMhcdi  -- x;y
+kpyp0    SMpyp   -- x;y
+kceh0    SMceh0  --;;y
+kici0    SMcit0  --;;y
+kihc0    SMhci0  -- x;y
+krc0     SMrc0   --;;y
+kryce    SMEce   --;;y;--
+Kprov0;SMprv0   --;;y
+Kont0;SMCont0  --;;y
+kin2    SMinv2   --;;y
+kfcm0   SMCom0   --;;y
+khc0;SMhca0   --;;y
+khad3   SMadm1   --;;y
+kenf1   SMenf1   --;;y
+kpsa0   SMscx0   --;;y
+kin0;SMinv0   --;;y
+kasis;SMEasi   --;;y;--Kcon0;SMCont1  --;;y
+Kct5;SMCart2  --;;y
+Kct0    SMCart0  --;;y
+Kct1;SMCart1  -- ;y
+Kcxp0;SMcxp0   --;;y
+Kin1    SMinv1   --;;y
+Kin3    SMinv3   --;;y
+Kinv    SMELogi  --;;y;--
+Klg0;SMleg0;--;;y
+Kca2;SMcaj2;--;;y
+Kco0    SMcf1;--;;y
+Kct3    SMcart3 --;;y
+Kct6    SMcart4 -- ;;y
+Kca0    SMcaj0  --;;y
+Kbdh    SMbdh   --;;y
+Kca4    SMcaj4  --;;y
+Kft3    SMfac3  --;;y
+Kglo0;SMGlo0  --;;y
+Kafin;SMEadfi --;;y;--
+
+Kont1;SMcont2 --;;y
+klb3    SMlb3;--;;y
+kppt2;SMpspt2 --;;y
+kacz0   SMcot0  --;;y
+kainf   SMinf   --;;y
+ktot0   SMtot0  --  ;y
+khco0   SMhco0  --;;y
+kiaf;SMacfi  --;;y;
+kjcb0   SMjuri0 --;;y
+kcon1   SMcont3 --;;y
+kcon2   SMcont4 --;;y
+kctx0   SMcart5 --;;Y
+konta   SMEcontab --;Y;--
+kryco   
+
+kaud;SMEaudit  --;Y;--
+klab    SMEAyudx  --;Y;--
+kact;SMEact    --;Y;--
+kppt0   SMpspt0   --;Y;
+kppt1;SMpspt1   --;Y
+kpto;SMEpresup --;Y;--
+kvom;SMEinvis  --;Y;--
+krycnf  SMEparam  -- ;Y;--
+khst    SMEhst    --;Y;--
+ksiau   SMEsiau   --;Y;--
+kadmi   SMEadmi;;;Y;--
+krips   SMErips   --;Y;--
+kaut    SMEauto   --;Y;--
+kguias  SMEProt   --;Y;--
+kryenf  SMEenfer  --;Y;--
+kcentral SMedico  --;y;--;
+
+---------------
+nomina
+
+k3ix  SMno
+k3fn0 Smnofun
+Kngn0  Smnogn
+Knseg  Smnoseg
+Knmm   smno4
+Knm3   smno3
+Knm0   smno0
+Knm2   smno2
+Knm1   smno1
+Knom   smnon
+
+-----
+Resoluciones
+k2fn0;SmRfn0
+k2gn0;SmRgn0
+k2ix;SmRe
+k2rc0;SmRrc0
+k2seg;SmRseg
+kceme;SmReme
+k2sy0;SmRsy0
+kprc0;SmRrc0
+kresol;SMResol
+ksiau;SmRsiau
+
+
+--------
+dinamic report
+
+dina     SMInfo
+difun    SMInfun
+dinamics SMInforme

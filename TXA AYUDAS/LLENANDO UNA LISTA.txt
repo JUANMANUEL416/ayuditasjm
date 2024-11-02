@@ -1,0 +1,50 @@
+
+1. DEBEN HABER 2 VARIABLES
+                 1.FORMATO DEL CAMPO
+;;;; 2.MINIMO 100 POR QUE ES LA LISTA
+
+
+LOC:SQL='SELECT DESCRIPCION FROM TGEN WHERE TABLA=''GENERAL'' AND CAMPO=''CLASEHOSP'''
+CLEAR(WDUM:RECORD)
+WDUM{PROP:SQL} = LOC:SQL
+LOOP UNTIL ACCESS:WDUM.NEXT()
+   LOC:CLASEHOSP = CLIP(LOC:CLASEHOSP)&CLIP(wdu:c1)&'|#'&CLIP(WDU:C1)&'|'
+END
+A# = LEN(CLIP(LOC:CLASEHOSP))
+LOC:CLASEHOSP = SUB(LOC:CLASEHOSP,1,a#-1)
+LOC:TIPOEST{PROP:FROM} = LOC:CLASEHOSP
+
+
+LOC:SQL='SELECT IDSEDE,DESCRIPCION FROM SED'
+CLEAR(WDUM:RECORD)
+WDUM{PROP:SQL} = LOC:SQL
+LOC:FROMSEDE='Todas|#Todas|'
+LOOP UNTIL ACCESS:WDUM.NEXT()
+   LOC:FROMSEDE = CLIP(LOC:FROMSEDE)&CLIP(wdu:c1)&' -- '&clip(wdum:c2)&'|#'&CLIP(WDU:C1)&'|'
+END
+A# = LEN(CLIP(LOC:FROMSEDE))
+LOC:FROMSEDE = SUB(LOC:FROMSEDE,1,a#-1)
+?LOC:IDSEDE{PROP:FROM} = LOC:FROMSEDE
+LOC:IDSEDE=GLO:IDSEDE
+
+'Enero|#1|Febrero|#2|Marzo|#3|Abril|#4|Mayo|#5|Junio|#6|Julio|#7|Agosto|#8|Septiembre|#9|Octubre|#10|Noviembre|#11|Diciembre|#12'
+' Domingo|#0| Lunes|#1| Martes|#2| Miercoles|#3| Jueves|#4| Viernes|#5| Sabado|#6'
+
+'Todas|#4|Alta Administrativa|#1|Alta Medica|#2|Alta Enfermeria|#3|Admitidos|#0'
+
+3430000
+---
+ing erika
+3017144369
+---
+
+-------
+(in:noadmision,in:tipohoja,in:ser)
+
+http://www.infospyware.com/Software/IFS.exe
+
+C:\DEV10\KrystalosCol190\Imagenes
+
+0100098843
+
+Brw:Entregas_Frarmacia(LOC:IDSECTOR1)

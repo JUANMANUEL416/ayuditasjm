@@ -1,0 +1,558 @@
+VENTANAS PEQUEÑAS
+-- 1075871702
+Usuario: JMANUEL
+Clave:     MB5678
+---
+Frm:HCANEDMED
+telefono citas CENTROCRU
+01800111923
+https://henaojara.com/episode/slime-taoshite-300-nen-espanol-latino-hd-1x4/
+https://drive.google.com/drive/u/0/folders/15X9b2djTNiBoO7pSsjShfCW6WcKuG4Ww?fbclid=IwAR2CR7tgSux3pSiCTEmmaEcHwk3J81NaraSUgMnK6V23y5NEi69cjH3r9QU
+https://programasdixguel.blogspot.com/p/enlaces-driver-packs-154-mega.html
+cafam - citas medicas
+IDCJDEPCLIATER
+https://mega.nz/#F!48c2BCyY!ehI4h-FwaSIqhAeuwCDNhg --CURSO DE SQL 2019
+AC200122356665
+Juan11ji@2019
+descargar mañana
+--https://www.descargasnsn.com/22812-curso-definitivo-de-javascript-domina-el-lenguaje-ms-versatil.html
+fondos gratis
+https://mega.nz/#F!BsQ1wDKb!nfiXLXDu_14oNYDBnnhEjA!IshRDBaA -- descargarugr
+MYSQL
+https://mega.nz/#F!QSxBVZCJ!yHPNNswCuZd3b9G07jcBaA!QPxmiCCZ
+https://mega.nz/#F!HhM2XIAQ!t9PdwaLe2S51DTfXNi2kFQ
+https://www.xmple.com/wallpaper/linear-blue-white-gradient-highlight--c2-00ffff-ffffff-l-50-a-120-f-21-image/
+http://cursosmegaup.bid/curso-definitivo-de-javascript-2016/
+https://mega.nz/#F!ZqYylDLb!Pwlr7VxDgxnpAfLi6kP2Mw!x24QDYbb
+https://aweita.larepublica.pe/cooltura/6433-10-paginas-de-cine-para-ver-peliculas-gratis-y-sin-interrupciones
+JUAN@123
+javascritp
+nodejs 
+
+https://mega.nz/#F!EOgQ1ALT!pbmofEYRednJHRXyd_obRg
+
+https://mega.nz/#F!ZiQXSQpC!S_eouDqMGATqCLuU-Ts4vA!864EUACD --!S_eouDqMGATqCLuU-Ts4vA
+https://www.youtube.com/watch?v=FFPGrnr82oE&list=PLM-Y_YQmMEqAedHjvY3_v7EfGfFCHXYHv
+http://mundomega.com/cursos-programacion.html#--
+--Manten tu moto polichada y protegida de los rayones al mejor precio.
+--Te lo llevamos a la puerta de tu casa, WHATS APP 319 7341853. $35,000 incluido domicilio en Bogotá. Duración: 6 meses
+https://www.youtube.com/watch?v=DW0zy42hunM&index=13&list=PLuEZQoW9bRnQAVxaDusY0fjRb2u7wgpzI
+https://www.descargasnsn.com/18866-curso-desarrollo-web.html
+https://www.youtube.com/watch?v=jffPjz09GF0--- MAESTRO DETALLE 
+http://www.fullaprendizaje.com/2016/12/cinco-sitios-web-para-descarga-programas-gratis-de-forma-segura..html
+-- comando cuando no reinica explorador windows
+cmd /c taskkill  /F /IM explorer.exe&explorer.exe
+-- crear usb boot
+--http://www.pendrivelinux.com/universal-usb-installer-easy-as-1-2-3/
+Selection.Replace Chr(10), Replacement:=" "--quital saltos en excel
+http://hdeleon.net/como-obtener-los-correos-de-una-cuenta-de-gmail-con-php-imap/ --INTERESANTE
+--icon:WIZFIND.ICO -603-- krystalos2018
+--icon:WASELECT.ICO
+--icono de contabilizar .\iconos\SMALL_MAN_MONEY.GIF
+.\ICONOS\cuadrado.jpg
+ BRW1::View:Browse{PROP:SQLFILTER}=
+ --REPORTES 
+ PROCESS:VIEW{PROP:SQLFILTER}=Loc:SQL
+ --WINDOW TAMAÑO
+ quickwindow{prop:height} = 225
+ ?OK {prop:height} = 17
+ ?Cancel{prop:height} = 17
+ 
+ quickwindow{prop:height} = 225
+ ?OK {prop:height} = 17
+ ?Cancel{prop:height} = 17 
+ 
+ -- ENCABEZADOS BROWSER
+ ?List{PROPLIST:header
+ ?List{PROPLIST:header,k#+2} = FORMAT(K#,@N02)
+ -- ACTUALIZAR IMPRESO
+ !Window  Manager AskPreview Despues PC
+   IF SELF.REPORT{PROP:FLUSHPREVIEW}
+      FTR:IMPRESO += 1
+      ACCESS:FTR.UPDATE()
+   ELSE
+      GLO:RPTCANCEL = 1
+      !STOP('CANCELADO')
+   END
+   QuickWindow{PROP:Text}=
+--PRUEBA OJO -- INIT OPEN WINDOWS
+	PRINTER{PROPPRINT:Copies} = GLO:COPIAS
+	--CELULAR CUN NORTE --322-2219344
+ -- MOSTRAR VISTA PREVIA O NO
+ --window Manager Open Report Despues PC
+If GLO:NROIMP>=1 then
+   ThisWindow.SkipPreview = TRUE
+else
+   ThisWindow.SkipPreview = FALSE
+end
+ BRW1::View:Browse{PROP:SQLOrder} = ‘Phone’
+PROCESS:VIEW{PROP:SQLORDER} = 'ID1,ID3' 
+--INIT PROCEDURE (PROCEDURE CLASSS)
+ ThisReport.AddSortOrder()
+ CASE IN:tab
+  OF 1
+   ThisReport.AppendOrder('NIEPE:NUMDOC')
+  OF 2
+   ThisReport.AppendOrder('NIEPE:NOMBRE_EMPLEADO,+NIEPE:NUMDOC')
+  OF 3
+   ThisReport.AppendOrder('NIEPE:IDAREA,+NIEPE:NOMBRE_EMPLEADO')
+  OF 4
+   ThisReport.AppendOrder('NIEPE:CCOSTO,+NIEPE:NOMBRE_EMPLEADO')
+ END
+-- SALTO PAGINA REPORTE
+EndPage(Report)
+ HACER ALGO EN EL REPORTE
+      SETTARGET(REPORT,?DetServ)
+        HIDE(?loc:codcups)
+     SETTARGET
+     
+REPORT$?Detail{PROP:height}     
+--CIERRE
+--- CAMBIA COLOR FUENTE EN REPORTE
+SETTARGET(REPORT,?Detail)
+?LOC:CUENTA{PROPSTYLE:FontColor} = COLOR:Red
+SETTARGET
+ W# = FnValorVariable('ASI_FIRMA_HC_ANCHO')
+ H# = FnValorVariable('ASI_FIRMA_HC_ALTO')
+--- MENSAJE DE ERROR
+IF ERRORCODE()
+   MESSAGE(FILEERROR(),'Confirmación',icon:hand)
+END
+POST(EVENT:CLOSEWINDOW)
+--FECHAS CLARION
+deformat('01/'&month(today())&'/'&year(today()),@d06)
+TercerosElegir 
+Brw:sel_TerCxc
+ GLO:IDAREA    = FnBuscaIdArea(glo:ccosto)
+ (string),string
+ -- FORMA SOLO LECTURA
+ ThisWindow.Init
+! [Priority 4950] La prioridad es importante!
+IF FAC:facturado = 1 THEN SELF.Request = ViewRecord.
+ -- IMPORTAR TXT
+clear(ARCHGEN:record,-1)
+SET(ARCHGEN)
+LOOP UNTIL ACCESS:ARCHGEN.NEXT()
+    =column_text (string,string,long),stringD
+END
+GLO:CATEGORIA=FNVALORVARIABLE('TERCATCONTRATANTE')
+GLO:CATEGORIA=FNVALORVARIABLE('TERCATEMPLEADO')
+GLO:CATEGORIA=FNVALORVARIABLE('TERCATIPS')
+GLO:CATEGORIA=FNVALORVARIABLE('TERCATPROVEEDOR')
+GLO:CATEGORIA=FNVALORVARIABLE('TERCATASEGURADORA')
+GLO:CATEGORIA=FNVALORVARIABLE('TERCATSECSALUD')
+TER:ELEGIR_TODOS
+ loc:nomtercero = FNDesCod('TER',RADFIN:IDTERCERO) --KFN0 --KAF0
+ ?image1{prop:text}= loc:firma
+display
+Brw:FForma_MedPos
+ Brw:RevisarConciliaciones
+ 
+ - SALVAR POSICION
+                  SavPosition = POSITION(BRW1::View:Browse)
+                  Win:AnularRecibo(fcj:codcaja, fcj:cnsfacj)
+                  RESET(BRW1::View:Browse,SavPosition)
+                  NEXT(BRW1::View:Browse)
+ --LOC:VLR_NORECONOCIDO
+ PerMed:Elegir
+ 'Enfermera'
+ --Permisos38667173
+  IF FnValidaAcceso(GLO:GRUPO,Globalerrors.getprocedurename(),'BDelet') Then
+  END 
+CASE MESSAGE('Está Seguro(a) de Generar la Factura?','Recobros',icon:question,button:yes+button:no, button:no,1)
+OF BUTTON:No
+cycle
+OF BUTTON:yES
+End
+ d
+ CASE MESSAGE('Cual Reporte Desea Imprimir','Programación Salas Cirugias',ICON:Question,'&Sala Actual|&Todas',1,0)
+OF 1  
+  
+OF 2   0100000112
+ 
+END
+569499
+-- BROWSER
+ BRW8.ResetFromView
+ Brw8.ResetQueue(Reset:Queue)
+ Brw8.PostNewSelection
+ -- UBICARME EN UN REGISTRO EN UN BROWSER
+ IMOV:CNSMOV=LOC:CNSMOV
+ SET(IMOV:IMOVCNSMOV,IMOV:IMOVCNSMOV)
+ ACCESS:IMOV.NEXT()
+ BRW1.RESETFROMFILE()
+ THISWINDOW.RESET(TRUE)
+ --COLORES
+   ?loc:gyp{PROP:FONTColor}=Color:Red
+ else
+  ?loc:gyp{PROP:FONTColor}=Color:Blue
+  -----
+SELECT @CONCEPTONOTA=dbo.FNK_VALORVARIABLE('IDINVNOTADB_DEV')
+ localizadores adicionnales
+ Brw:AUFMT_Elegir
+ CHOICE(?CurrentTab) = 3
+ busca afi ars
+ AfiliadosARS:Elegir
+ 'Activo'
+ busca med tratante ares
+ Brw:MedTratante
+ tabla: CTCM
+ ?Group1
+ busca ddx
+ mdx:Elegir
+ busca homologos
+ Brw:Homologos
+ idarticulo
+ tabla ;serr
+ busca poos
+ Brw:MedPOS
+ tabla ser
+ 
+busca plan
+PPT:Elegir
+busca area:
+AFU_Prest:Elegir --KGN9
+Brw:sel_centrosAfu --KGN9
+UNIDAD DE NEGOCIO
+Brw:Sel_KUNG--Kcg0
+
+PROGRAMA FINANCIERO
+Brw:Sel_KPRG -- Kcg0
+
+BRW1::View:Browse{PROP:SQLFILTER}=
+
+BUSCA CUENTA CONTABLE
+Brw:Sel_CUE_Filtro
+If FnValorVariable('CCOSTOCONAREA') = 'SI'
+               Brw:sel_centrosAFU(HPRE:IDAREA)
+            Else
+               Brw:sel_centros
+            End
+END
+0100000048
+llamar usuarios
+D:\DOCUMENTOS JOSE\KGIAS Y PROCEDIMIENTOS\
+Brw:Notas_Provisiones
+brw:provcnf
+ProcesaProvisiones
+Brw:Provisiones
+KGN3
+COLUMN_TEXT
+(string,string,long),string
+FNENCRIPTADES
+(string,short),string
+MdxFiltro_SEXDAD:Elegir_1
+(long,string,long,long,string)
+FnMontoEscrito1
+(string),string
+FnMsgEdad
+(date,date),string
+FNGENERACONSECUTIVO
+(string,string),long
+FNVALIDAACCESO
+(string,string,string),long
+FNSQLFMT
+(string),string
+FNVALORVARIABLE
+(string),string
+BRW1.INSERTCONTROL = 0
+BRW1.CHANGECONTROL = 0
+BRW1.DELETECONTROL = 0               
+?Insert
+?Change
+?Delete
+Brw:GuiasyProtocolos
+Brw:ConsumosAdmon
+
+USUSU:Elegir
+aut:noaut = CLIP(GLO:IDSEDE)&FORMAT(FNGENERACONSECUTIVO(GLO:IDSEDE,'@AUTF'),@N08)
+AUT:IDAUT = clip(glo:idsede)&format(FnGeneraconsecutivo(glo:idsede,'@AUT'),@n08)
+
+--/***** PROCESOS DE UN BOTOM en un browse
+
+CASE KEYCODE()    !PROCESS THE KEYSTROKE
+OF MOUSELEFT2
+  POST(EVENT:ACCEPTED,?BMARCAR)
+END
+QMARCAS:IDSERVICIO =     BRW7.Q.LPERD:IDSERVICIO
+GET(QMARCAS,QMARCAS:IDSERVICIO)
+IF ERRORCODE()
+   QMARCAS:IDSERVICIO = BRW7.Q.LPERD:IDSERVICIO
+   ADD(QMARCAS)
+ELSE
+   IF BRW7.Q.LOC:MARCA   = 1
+      !BRW7.Q.LOC:MARCA   = 0
+      DELETE(QMARCAS)
+   ELSE
+
+   END
+END
+BRW7.Q.LOC:MARCA   = 1
+BRW7.RESETQUEUE(1)
+-- MARCAR Y SIGUIENTE
+IF CLIP(RPDX:CANTIDAD) = 0
+    RPDX:CANTIDAD = 1
+ELSE
+    RPDX:CANTIDAD = 0
+END
+Access:RPDX.Update()
+BRW1.RESETFROMFILE()
+POST(Event:ScrollDown,?RPDX)
+Select(?RPDX)
+
+
+--*****/s
+
+
+tgen:Elegir
+'General', 'VALIDADORRIPS', 'Validadores RIPS'
+'General', 'PATOLOGIAS', 'Clases de patología'
+'General', 'COBERTURA', 'Coberturas en salud'
+'General', 'AREASARS', 'Areas Servicios de salud'
+'General', 'PROSIAU', 'Detalle Tramite'
+'General', 'CONTRASIAU', 'Detalle Tramite'
+'General', 'DISCAPIDAD', 'Tipo Discapacidad'
+'General', 'CONDICION', 'Condicion Afiliado'
+'General', 'ETNIAS', 'Listado Etnias'
+'General', 'ASENTAMIENTO', 'Listado Etnias'
+'VACUNACION', 'VACUNADOR', 'Vacundadores'
+Frm:HJNOPOS
+'MEDICO'
+Rpt:JustificaNp
+Rpt:J_NOPOS
+--HJNOPOS:CNSHJNOPOS
+OPCIONES DE BOTONES
+Brw:NoAfiliado_Elegir
+CatConceptosFinCNT
+'otros'
+ ICON:None 		No icon
+ ICON:Application
+ ICON:Question 		?
+ ICON:Exclamation 		!
+ ICON:Asterisk 		*
+ ICON:VCRtop 		>>|
+ ICON:VCRrewind 		<<
+ ICON:VCRback 		<
+ ICON:VCRplay 		>
+ ICON:VCRfastforward		>>
+ ICON:VCRbottom 		|<<
+ ICON:VCRlocate 		?
+IF LOC:FECHAINI <> '' THEN
+   LOC:FILTRO=CLIP(LOC:FILTRO)&' AND FECHARAD >='&FNSQLFMT(FORMAT(LOC:FECHAINI,@D6))
+END
+IF LOC:FECHAFIN <> '' THEN
+   LOC:FILTRO=CLIP(LOC:FILTRO)&' AND FECHARAD <'&FNSQLFMT(FORMAT(LOC:FECHAFIN + 1,@D6))
+END
+
+Brw:GestionSiau
+CASE THISWINDOW.REQUEST
+OF INSERTRECORD
+ DISABLE(?SHEET:X)
+OF CHANGERECORD
+ ENABLE(?SHEET:X)
+OF DELETERECORD
+ DISABLE(?CURRENTTAB)
+ DISABLE(?SHEET:X)
+END
+PROCEDURE
+archivos{prop:owner} =  GLO:DSN
+
+IF ERRORCODE()       !Back-end-specific error occurred
+ MESSAGE(FILEERROR())
+ SETCLIPBOAR
+ RETURN
+END
+|
+
+
+OPEN
+
+GlobalRequest = ChangeRecord
+
+ IMOV:CNSMOV=LOC:CNSMOV
+ SET(IMOV:IMOVCNSMOV,IMOV:IMOVCNSMOV)
+ ACCESS:IMOV.NEXT()
+ BRW1.RESETFROMFILE()
+ THISWINDOW.RESET(TRUE)
+
+---VALIDACIONES EDITPLACE
+-- ANTES DE TAKEACETED
+IF BRW6.Q.RPDX:VALOR1 < BRW6.Q.RPDX:VALOR2 THEN
+   MESSAGE('El valor de la glosa no puede superar el valor de la Factura!', 'Valor Glosa', ICON:EXCLAMATION)
+   BRW6.Q.RPDX:VALOR2 = 0
+END
+--TAKE EVENT
+IF BRW6.Q.RPDX:GRUPOETAREO = 'C' THEN
+   Return EditAction:Cancel
+   thiswindow.reset(true)
+End
+10% + vigencia + 3 meses mas cumplimiento y calidad
+--
+--
+--
+  IF loc:cargarfirma
+  
+                       Arc:nombre      = loc:firma
+                       GLO:DosFileName = Arc:nombre
+                       OPEN(DosFile)
+                       FileSize# = BYTES(DosFile)
+                       Arc:nombre{PROP:Size} = FileSize#
+                       LastRec# = FileSize# % SIZE(DOS:Record)
+                       SavPtr# = 1
+                       LOOP INT(FileSize#/SIZE(DOS:Record)) TIMES
+                          GET(DosFile,SavPtr#)
+                          ASSERT(NOT ERRORCODE())
+                          Arc:dicom[SavPtr# - 1 : SavPtr# + SIZE(DOS:Record) - 2] = DOS:Record
+                          SavPtr# += SIZE(DOS:Record)
+                       END
+                       IF LastRec#
+                          GET(DosFile,SavPtr#)
+                          ASSERT(BYTES(DosFile) = LastRec#)
+                          Arc:dicom[SavPtr# - 1 : SavPtr# + LastRec# - 2] = DOS:Record
+                       END
+  
+                       ASSERT(NOT ERRORCODE())
+                       CLOSE(DosFile)
+                       if not access:archivos.insert()
+                       message('Archivo de Imagen Grabado.','krystalos',icon:question)
+                       else
+                       message('Error al grabar archivo de imagen:' & fileerror() & errorcode())
+                       end
+                       archivos{PROP:SQL}  = 'SELECT @@IDENTITY'
+                       NEXT(archivos)
+                       MED:IDFIRMA        = Arc:id
+  
+  END
+  ?image1{prop:text}= loc:firma
+display
+--ini
+archivos{prop:owner} =  GLO:DSN
+
+Arc:id = MED:IDFIRMA
+access:archivos.fetch(Arc:PK_Archivos)
+?Image1{PROP:ImageBlob} =Arc:dicom{PROP:Handle}
+?Image1{PROP:Width}  = 200
+?Image1{PROP:Height} = 100
+display
+  
+ --IMPRIMIR FIRMA
+      W# = FnValorVariable('ASI_FIRMA_HC_ANCHO')
+      H# = FnValorVariable('ASI_FIRMA_HC_ALTO')
+      Arc:id = MED:IDFIRMA
+      access:archivos.fetch(Arc:PK_Archivos)
+      Report$?Image2{PROP:ImageBlob} = Arc:dicom{PROP:Handle}
+      Report$?Image2{PROP:Width}   = W# * 400
+      Report$?Image2{PROP:Height}  = H# * 400
+	  
+	 
+ 
+globlampaa
+Module('Win32.lib')
+ShellExecute(Long,*CString,*CString,*CString,*CString,Short),UShort,PASCAL,RAW,NAME('ShellExecuteA')
+END
+
+DESPUE FIEL
+DosFile    FILE,DRIVER('DOS'),PRE(DOS),NAME(GLO:DosFileName)
+
+Record      RECORD
+F1           STRING(2000)
+            END
+           END
+
+EDAD
+
+IF LOC:RUTA <>'' THEN
+!TRAER SOLO EL NOMBRE DEL DOCUMENTO
+    LOC:SQL = 'SELECT dbo.FNK_SELECT_NOMB_ARCHI('&FNSQLFMT(LOC:RUTA)& ')'
+    CLEAR(WDUM:RECORD)
+    WDUM{PROP:SQL} = LOC:SQL
+    ACCESS:WDUM.NEXT()
+    KGUIASD:RUTA =  CLIP(KGUIASD:CNSGUIA)&'_'&CLIP(KGUIASD:ITEM)&'_'&WDUM:C1
+
+    COPY(CLIP(LOC:RUTA),CLIP(FNVALORVARIABLE('KGUIAS_PAT'))&CLIP(KGUIASD:RUTA))
+
+
+    IF ERRORCODE()  THEN      !If not enough memory
+       stop('Error al guardar el documento Comuníquese con el administrador del sistema') !display message
+       CYCLE
+    END
+ELSE
+    MESSAGE('SELECIONE LA RUTA Y TIPO DE DOCUMENTO')
+    CYCLE
+    
+
+END
+		   
+---IDCARGOCARTERA		   
+ptcdp:compania=ptpto:compania and ptcdp:consecutivo=ptpto:consecutivo	
+
+CLEAR---
+
+CLEAR(AFI:RECORD)
+AFI:IDAFILIADO = FTR:IDAFILIADO
+IF ACCESS:AFI.TRYFETCH(AFI:AFIIDAFILIADO) THEN CLEAR(AFI:RECORD) END
+LOC:NOMUSUSARIO = CLIP(AFI:PAPELLIDO)&' '&CLIP(AFI:SAPELLIDO)&' '&CLIP(AFI:PNOMBRE)&' '&CLIP(AFI:SNOMBRE)
+
+  CLEAR(TER:RECORD)
+  TER:IDTERCERO=CTCSOL:IPSSOLICITA
+  IF ACCESS:TER.TRYFETCH(TER:TERIDTERCERO) THEN CLEAR(TER:RECORD) END
+  LOC:IPSSOL=TER:RAZONSOCIAL 
+  
+CLEAR(SER:RECORD)
+SER:IDSERVICIO=CTCSOLD:IDSERVICIO
+IF ACCESS:SER.TRYFETCH(SER:SERIDSERVICIO) THEN CLEAR(SER:RECORD).
+LOC:DESCSERVICIO=SER:DESCSERVICIO
+
+CLEAR(IART:RECORD)
+IART:IDARTICULO=CTCSOL:IPSSOLICITA
+IF ACCESS:IART.TRYFETCH(IART:IARTIDARTICULO) THEN CLEAR(IART:RECORD) END
+LOC:DESCRIPCION=IART:DESCRIPCION
+
+
+  if FnValorVariable('ASI_UTILIZAFIRMA_HC') = 'SI'
+      !SI EL REPORTE ESTA EN PULGADAS
+      !1000 UNIDADES SON 2.5 CM
+      !Felipe 20 AGO 2008
+  
+      W# = FnValorVariable('ASI_FIRMA_HC_ANCHO')
+      H# = FnValorVariable('ASI_FIRMA_HC_ALTO')
+      Arc:id = MED:IDFIRMA
+      access:archivos.fetch(Arc:PK_Archivos)
+      Report$?Image2{PROP:ImageBlob} = Arc:dicom{PROP:Handle}
+      Report$?Image2{PROP:Width}   = W# * 400
+      Report$?Image2{PROP:Height}  = H# * 400
+	  
+	  Brw:Registro_Val
+Brw:Busca_Compra
+IMOV:CNSITRA     = GLO:NOADMISION
+IMOV:IDTERCERO   = GLO:IDTERCERO
+IMOV:NODOCUMENTO = GLO:NOADMISIONB
+IMOV:IDAREA      = GLO:CCOSTO
+IMOV:CCOSTO      = GLO:IDAREA		   
+	MenuItemDevolucion	 
+https://www.youtube.com/watch?v=tpTWPtC6P-4	
+
+--RECORRER UNA TABLA CON CLARION
+    clear(a_hcad:record,-1)
+    a_hcad:consecutivo = a_hca:consecutivo
+    set(A_HCAD:HCADCONSECUTIVO,A_HCAD:HCADCONSECUTIVO)
+    loop until access:a_hcad.next()
+    
+https://www.youtube.com/watch?v=c7HL7JffCBc
+
+--VENTANAS
+        0{prop:wallpaper} = GLO:WinWallpaper
+        CASE GLO:WinWallpaperM
+        OF 'S'
+           0{prop:centered} = 0
+           0{prop:tiled} = 0
+        OF 'C'
+           0{prop:centered} = 1
+        OF 'T'
+           0{prop:tiled} = 1
+        END!CASE
+        0{prop:gray}      = GLO:Win3d
+        0{prop:Font ,3}   = GLO:WinColorT
+        0{prop:color,1}   = GLO:WinColor1
+        0{prop:color,2}   = GLO:WinColor2
+        0{prop:color,3}   = GLO:WinColor3

@@ -1,0 +1,10 @@
+
+fecha_aplicacion	item_prod	cantidad_utili	cantidad_sob	fin_estab
+8 am				1			1000			0	
+8 am				2			200				800				8 pm
+
+4 pm				2			800				0
+					3			400				600				4 am
+					
+12 pm				3			600				0
+					4			600				400				12 m
