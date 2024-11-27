@@ -1,0 +1,318 @@
+SET LANGUAGE Spanish;
+https://cinternacionalcompe-my.sharepoint.com/:v:/g/personal/masoto_cinternacional_com_pe/EUZrmN-TispIoJYWyOc3HjwBwsNI4PSx1Q6CF3YfWIoIvA?referrer=Teams.TEAMS-ELECTRON&referrerScenario=MeetingChicletGetLink.view
+formularios 
+ <q-dialog v-model="fmrNotasDbCr" persistent>
+      <q-card style="width: 70%; max-width: 150vw">
+        <q-form @submit="takeCompletedFCXP()" @reset="onResetFCXP">
+          <q-bar class="text-white bg-primary">
+            <div class="col text-center text-weight-bold">
+              ({{ dataFCXP.PROCESO }}) - Gestion FCXP
+            </div>
+            <q-btn dense flat icon="close" v-close-popup>
+              <q-tooltip content-class="bg-white text-negative">Cerrar</q-tooltip>
+            </q-btn>
+          </q-bar>
+          <q-card-section>
+            <div class="row q-col-gutter-xs q-py-xs">
+
+            </div>
+          <q-card-actions align="right">
+            <q-btn label="Guardar" type="submit" color="primary" />
+            <q-btn flat label="Cancelar" color="primary" v-close-popup />
+          </q-card-actions>
+        </q-form>
+      </q-card>
+    </q-dialog> 
+
+Buscadores
+ <q-dialog v-model="XXX">
+      <q-card style="width: 700px; max-width: 80vw" class="q-pa-none">
+        <q-bar dark class="bg-green text-primary">
+          <div class="col text-center text-weight-bold">Catalogo Clientes</div>
+          <q-btn dense flat round icon="close" color="primary" v-close-popup />
+        </q-bar>
+        <q-card-section class="q-pa-none">
+	//componente
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+  <q-dialog v-model="Vernotastxt" persistent >
+      <q-card style="width: 70%; max-width: 70vw" class="q-pa-none">
+        <q-card>
+            <q-bar dark class="bg-teal-5 text-primary">
+              <div class="col text-center text-weight-bold" >
+                Carga Masiva Notas
+              </div>
+              <q-btn dense flat round icon="close" color="primary" v-close-popup>
+                <q-tooltip class="bg-primary text-white text-body2" transition-show="flip-right" transition-hide="flip-left" :offset="[10, 10]" >
+                  Cerrar
+                </q-tooltip>
+              </q-btn>
+            </q-bar>
+            <q-card>
+              <div class="row">
+                <q-select class="col-xs-12 col-sm-6 col-md-6 q-pa-sm" v-model="ClaseNotaTxt" square outlined dense map-options emit-value label="Clase de Nota"
+                        :options="[{value: 'C' , label: 'Credito'},{value: 'D' , label: 'Debito'}]" disabled />
+                <div class="col-2 q-pa-xs">
+                    <q-input label="N_Factura:" clearable outlined stack-label map-options emit-value dense  v-model="ffactura" />
+                </div>
+                <div class="col-2 q-pa-xs">
+                     <q-checkbox class="col-2 q-pa-xs" v-model="ferror" label="Con Errores" dense />
+                </div>
+              </div>
+            </q-card>
+            <q-card>
+                <q-card-section class="q-pb-none q-pt-none row">
+                  <div class="row col-12">
+                      <ServerSideTableComponent
+                      class="col-12"
+                      :tabla="dtRpdx.tabla"
+                      :titulo="dtRpdx.titulo"
+                      :row_key="dtRpdx.row_key"
+                      :columnas="dtRpdx.columnas"
+                      :columnas_visibles="dtRpdx.columnas_visibles"
+                      :inner_join="dtRpdx.inner_join"
+                      :left_join="dtRpdx.left_join"
+                      :condicion_adicional="WhereRPDX"
+                      :permiteExportarExcel="true"
+                      :columnas_filtro="dtRpdx.columnas_filtro"
+                      :ordenarPor="dtRpdx.ordenarPor"
+                      dense
+                      ref="tableRpdx"
+                      @evento_generico="ProcesosRpdx($event)"
+                      :rowsPerPage="10"
+                    >
+                    </ServerSideTableComponent>
+                  </div>
+                </q-card-section>
+              </q-card>
+            <q-card-actions align="center">
+              <q-btn no-caps glossy label="Generar Notas" color="teal-6" text-color="white" icon="fa-solid fa-gears" @click="GenerarNotas()"/>
+              <q-btn no-caps glossy label="Cancelar" color="negative" text-color="white" icon="fa-solid fa-square-xmark" @click="LimpirarTemporal()"/>
+              <!-- <q-btn label="Salir"  no-caps glossy color="teal-6" text-color="white" icon="fa-solid fa-arrow-right-from-bracket" @click="Salir()"/> -->
+            </q-card-actions>
+        </q-card>
+    </q-card>
+  </q-dialog>
+  --Confirmar 
+  <q-dialog v-model="confirmaGenNotas">
+      <q-card style="width: 700px; max-width: 80vw" class="q-pa-none">
+        <q-bar dark class="bg-cyan-13 text-primary">
+          <div class="col text-center text-weight-bold">Generación de Notas Debito Credito </div>
+          <q-btn dense flat round icon="close" color="primary" v-close-popup />
+        </q-bar>
+        <q-card-section>
+         existen Registros que no Fueron Validados, Solo se generaran las Notas de los Registros Validos,
+         los demas seran borrados
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn label="Confirmar" color="primary"  @click="confirmar()" />
+           <q-btn label="Cancelar" color="negative" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+	
+	-- permisos
+	 import { useUsgruh } from "src/composables/useUSGRUH"
+	 const usgruh = useUsgruh();
+	 const permisos = reactive({})
+	 
+usgruh.getPermiso('MENUQ_ENFERMERIA', 'AsignaTurno').then(permiso=>{permisos.asignacion = permiso})	
+	
+-- validaciones 
+    $q.notify({ color: "negative", message: "Seleccione una clase de Nota DB-CR, Intente de Nuevo", position: "top", timeout: 2000, })
+    return false
+pdf
+    <PDFViewerComponent :document="pdfDocument"
+      ref="pdfRef"
+      v-if="pdfDocument"
+      @close="pdfDocument = null"
+    ></PDFViewerComponent>	
+	
+	
+  .text(``, x+32, y+14, {
+        align: "justify",
+        lineHeightFactor: 1.5,
+        maxWidth: 155,
+      })
+  .text(``, x+32, y+30, {
+        align: "justify",
+        lineHeightFactor: 1.5,
+        maxWidth: 155,
+      })
+	  
+--FORMULARIOS
+<q-input class="col-xs-12 col-sm-12 col-md-2 q-pa-sm" v-model="dataFCXP.VALOR" type="number"  label="Valor Bruto" square outlined stack-label dense disable/>
+input varias lineas
+   <q-input class="col-xs-12 col-sm-12 col-md-12 q-pa-sm" v-model="dataFCXP.OBSERVACION" type="text"
+              label="Observacion" square outlined stack-label dense autogrow/>
+chek
+              <q-checkbox class="col-xs-12 col-sm-6 col-md-6 q-pa-sm" v-model="dataFCXP.VARIOSTER" label="Varios Terceros" dense />
+select 
+              <q-select class="col-xs-12 col-sm-6 col-md-6 q-pa-sm" v-model="dataFCXP.SEAMORTIZA" square outlined dense
+                        map-options emit-value label="Se Amortiza"
+                        :options="[{value: 0 , label: 'No'},{value: 1 , label: 'Si'}]" />
+BOTON BUSQUEDA
+      <q-item dense class="col-3 col-xs-12 col-sm-12">
+              <q-item-section top avatar>
+                <q-avatar color="blue-6" text-color="white" icon="fa-solid fa-magnifying-glass-plus" class="cursor-pointer" @click="BuscaTer()" >
+                  <q-tooltip class="bg-primary text-body2" transition-show="flip-right" transition-hide="flip-left" :offset="[10, 10]" >
+                    Id.Tercero
+                  </q-tooltip>
+                </q-avatar>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label caption>Nit.Tercero  Razón Social</q-item-label>
+                <q-item-label lines="8">
+                  {{filtro?.NIT}} {{ filtro?.RAZONSOCIAL }}
+                  </q-item-label>
+              </q-item-section>
+        </q-item>
+		
+llamar sql
+
+  const retirarFacturaCxC =  () => {
+  $q.loading.show({ message: 'Procesando Item...' })
+   AppStore
+      .json({
+        MODELO: "FCXC_COL",
+        METODO: "QUITAFACT_FCXC",
+        PARAMETROS: {
+          CNSCXC:ModelFcxc.CNSCXC,
+          N_FACTURA: nfacturaRet.value,
+          MOTIVO   : motivoRetiro.value
+        },
+      })
+      .then((res) => {
+      if(res.data.result.recordset[0].OK==='OK'){
+        setTimeout(() => {
+          tableFcxcd.value.obligarRefrescar();
+          }, 100)
+      }else{
+        var error =res.data.result.recordset[0].ERROR
+          $q.notify({
+            color: "negative",
+            message:  "Error al retirar Factura   "+error,
+            position: "top",
+            timeout: 2000,
+          });
+      }
+    })
+    .finally(() => {
+      $q.loading.hide();
+    })
+    }		
+	
+-- MODELO SPQ
+CREATE OR ALTER PROCEDURE DBO.SPQ_NOMBRE_SPQ @JSON NVARCHAR(MAX)
+	WITH ENCRYPTION
+AS
+SET DATEFORMAT dmy
+DECLARE @TBLERRORES TABLE (ERROR VARCHAR(MAX))
+DECLARE  @PARAMETROS NVARCHAR(MAX)			,@MODELO VARCHAR(100)			   ,@METODO VARCHAR(100)
+		,@USUARIO VARCHAR(12)				   ,@COMPANIA VARCHAR(2)		      ,@IDSEDE      VARCHAR(5)		
+      ,@SYS_COMPUTERNAME VARCHAR(200)     ,@DATOS    VARCHAR(MAX)
+
+BEGIN
+	SELECT *
+	INTO #JSON
+	FROM OPENJSON(@json) WITH (
+			MODELO VARCHAR(100) '$.MODELO'
+			,METODO VARCHAR(100) '$.METODO'
+			,USUARIO VARCHAR(12) '$.USUARIO'
+			,PARAMETROS NVARCHAR(MAX) AS JSON
+	)
+
+	SELECT   @MODELO = MODELO			,@METODO = METODO
+			,@PARAMETROS = PARAMETROS	,@USUARIO = USUARIO
+	FROM #JSON
+END
+
+-- boton lista
+          <q-btn-dropdown class="q-ml-sm" label="Acciones" no-caps color="light-blue" glossy
+            v-if="seleccionado && dataGuarda.CERRADA == '1'">
+            <q-list>
+              <q-item clickable v-close-popup @click="AnularFnot()"
+                v-if="seleccionado && dataGuarda.CERRADA == '1' && dataGuarda.ESTADO != 'A'">
+                <q-item-section avatar>
+                  <q-avatar icon="fa-solid fa-circle-minus" color="light-blue" text-color="red" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Anular Nota</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-icon name="info" color="amber">
+                    <q-tooltip class='bg-purple text-body2' transition-show='flip-right' transition-hide='flip-left'
+                      :offset='[10, 10]'>
+                      Detalle: Anular NotaDBCR
+                    </q-tooltip>
+                  </q-icon>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="ImprimirFnotFmt(seleccionado)"
+                v-if="seleccionado && dataGuarda.CERRADA == '1'">
+                <q-item-section top avatar>
+                  <q-avatar color="light-blue" text-color="white" icon="fa-solid fa-print" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Imprmir Nota</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-icon name="info" color="amber">
+                    <q-tooltip class='bg-primary text-body2' transition-show='flip-right' transition-hide='flip-left'
+                      :offset='[10, 10]'>
+                      Detalle: imprimir Nota DB CR
+                    </q-tooltip>
+                  </q-icon>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="impComprobante(dataGuarda.NROCOMPROBANTE)"
+                v-if="seleccionado && dataGuarda.CERRADA == '1' && dataGuarda.ESTADO != 'A' && dataGuarda.CONTABILIZADA == '1'">
+                <q-item-section top avatar>
+                  <q-avatar color="light-blue" text-color="white" icon="fas fa-usd-square" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Comprobante</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-icon name="info" color="amber">
+                    <q-tooltip class='bg-primary text-body2' transition-show='flip-right' transition-hide='flip-left'
+                      :offset='[10, 10]'>
+                      Detalle: imprimir Comprobante
+                    </q-tooltip>
+                  </q-icon>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="inImprimirftrCi(dataGuarda.N_FACTURA)"
+                v-if="seleccionado && dataGuarda.N_FACTURA != ''">
+                <q-item-section top avatar>
+                  <q-avatar color="light-blue" text-color="white" icon="fas fa-usd-square" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>N_Factura</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-icon name="info" color="amber">
+                    <q-tooltip class='bg-primary text-body2' transition-show='flip-right' transition-hide='flip-left'
+                      :offset='[10, 10]'>
+                      Detalle: Ver Factura
+                    </q-tooltip>
+                  </q-icon>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+		  
+    {
+      name: "btnNota",
+      align: "left",
+      boton: {
+        icon: (val) => `fas fa-file-${val?.ESTNOTAUD === 'Sin Nota' ? 'slash' : val?.ESTNOTAUD === "Sin Revisar" ? "exclamation" : "check"}`,
+        emit: "NotaAUDFtr",
+        color: (val) => `${val?.ESTNOTAUD === 'Sin Nota' ? 'grey' : val?.ESTNOTAUD === "Sin Revisar" ? "orange" : "green"}`,
+        flat: true,
+        tooltipText: "Nota de Auditoría",
+        tooltipClass: "bg-indigo-5",
+      },
+    },		  
+	
