@@ -1,7 +1,10 @@
 USER: bitsadomi\jjimenez
 PASS: Bit.ss.JM2206
 --PASS: 5581-4ff4-a524
-PASS: 5581-4ff4-202502
+PASS: 5581-4ff4-202504
+uozmrscffcqfldmv 
+030910302
+3003705398
 bitsssarto
 32563049
 Coopcar24$$
@@ -10,6 +13,7 @@ josemene98*
 10.240.0.36
 COTAGDOMI\administrador
 655
+rad: 8016363351 ->
 Fundacion2024.
 S1stem@sJJ
 --CONTROL DIA HABIL -- PE525 -> 
