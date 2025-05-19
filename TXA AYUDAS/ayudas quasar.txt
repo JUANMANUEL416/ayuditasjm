@@ -23,7 +23,9 @@ formularios
         </q-form>
       </q-card>
     </q-dialog> 
-
+                      no-caps
+                      outline
+                      glossy
 Buscadores
  <q-dialog v-model="XXX">
       <q-card style="width: 700px; max-width: 80vw" class="q-pa-none">
