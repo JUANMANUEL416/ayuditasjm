@@ -75,6 +75,34 @@ DECLARE @CONSULTAS TABLE (
    ID int identity(1,1),
    xconsecutivo int
 )
+DECLARE @CONSULTAS2 TABLE (
+	codPrestador VARCHAR(20),
+	consecutivo VARCHAR(20),
+	IDAFILIADO VARCHAR(20),
+	fechaInicioAtencion VARCHAR(16),
+	numAutorizacion VARCHAR(30),
+	codConsulta VARCHAR(10),
+	modalidadGrupoServicioTecSal VARCHAR(2),
+	grupoServicios VARCHAR(2),
+	codServicio INT,
+	finalidadTecnologiaSalud VARCHAR(2),
+	causaMotivoAtencion VARCHAR(2),
+	codDiagnosticoPrincipal VARCHAR(20),
+	codDiagnosticoRelacionado1 VARCHAR(20),
+	codDiagnosticoRelacionado2 VARCHAR(20),
+	codDiagnosticoRelacionado3 VARCHAR(20),
+	tipoDiagnosticoPrincipal VARCHAR(3),
+	vrServicio int,
+	tipoPagoModerador VARCHAR(2),
+	tipoDocumentoIdentificacion VARCHAR(2),
+	numDocumentoIdentificacion VARCHAR(20),
+	conceptoRecaudo VARCHAR(20),
+	valorPagoModerador INT,
+	numFEVPagoModerador VARCHAR(20),
+	usuarioId  INT,
+   ID int ,
+   xconsecutivo int
+)
 DECLARE @CONSULTAS1 TABLE (
 	IDCONSULTA INT IDENTITY PRIMARY KEY,
 	codPrestador VARCHAR(20),
@@ -132,6 +160,35 @@ DECLARE @MEDICAMENTOS TABLE (
    ID int identity(1,1),
    xconsecutivo int
 )
+DECLARE @MEDICAMENTOS2 TABLE (
+	codPrestador VARCHAR(20),
+	IDAFILIADO VARCHAR(20),
+	CONSECUTIVO VARCHAR(20),
+	idMIPRES       VARCHAR(15),
+	fechaDispensAdmon VARCHAR(16),
+	codDiagnosticoPrincipal VARCHAR(20),
+	codDiagnosticoRelacionado VARCHAR(20),
+	tipoMedicamento VARCHAR(4),
+	codTecnologiaSalud VARCHAR(20),--CODCUM
+	nomTecnologiaSalud VARCHAR(30),
+	concentracionMedicamento INT,
+	unidadMedida int,
+	formaFarmaceutica VARCHAR(8),
+	unidadMinDispensa INT,
+	cantidadMedicamento INT,
+	diasTratamiento     SMALLINT,
+	tipoDocumentoIdentificacion VARCHAR(2),
+	numDocumentoIdentificacion VARCHAR(20),
+	vrUnitMedicamento DECIMAL(14,2),
+	vrServicio DECIMAL(14,2),
+	conceptoRecaudo VARCHAR(20),
+	tipoPagoModerador VARCHAR(2),
+	valorPagoModerador INT,
+	numFEVPagoModerador VARCHAR(20),
+	usuarioId  INT,
+   ID INT,
+   xconsecutivo int
+)
 
 DECLARE @PROCEDIMIENTOS TABLE (
 	codPrestador VARCHAR(12),
@@ -158,6 +215,33 @@ DECLARE @PROCEDIMIENTOS TABLE (
 	numFEVPagoModerador VARCHAR(20),
 	usuarioId  INT,
    ID int identity(1,1),
+   xconsecutivo int
+)
+DECLARE @PROCEDIMIENTOS2 TABLE (
+	codPrestador VARCHAR(12),
+	IDAFILIADO VARCHAR(20),
+	CONSECUTIVO VARCHAR(20),
+	fechaInicioAtencion VARCHAR(16),
+	idMIPRES VARCHAR(15),
+	numAutorizacion VARCHAR(30),
+	codProcedimiento VARCHAR(6),
+	viaIngresoServicioSalud VARCHAR(2),
+	modalidadGrupoServicioTecSal VARCHAR(2),
+	grupoServicios VARCHAR(2),
+	codServicio INT,
+	finalidadTecnologiaSalud VARCHAR(2),
+	tipoDocumentoIdentificacion VARCHAR(2),
+	numDocumentoIdentificacion VARCHAR(20),
+	codDiagnosticoPrincipal VARCHAR(20),
+	codDiagnosticoRelacionado VARCHAR(20),
+	codComplicacion VARCHAR(20),
+	vrServicio int, --VARCHAR(20),
+	conceptoRecaudo VARCHAR(20),
+	tipoPagoModerador  VARCHAR(2),
+	valorPagoModerador  INT,
+	numFEVPagoModerador VARCHAR(20),
+	usuarioId  INT,
+   ID int ,
    xconsecutivo int
 )
 DECLARE @PROCEDIMIENTOS1 TABLE (
@@ -276,6 +360,29 @@ DECLARE @OTROSSER TABLE (
 	numFEVPagoModerador VARCHAR(20),
 	usuarioId  INT,
    ID int identity(1,1),
+   xconsecutivo int
+)
+DECLARE @OTROSSER2 TABLE (
+	codPrestador VARCHAR(20),
+	IDAFILIADO VARCHAR(20),
+	CONSECUTIVO VARCHAR(20),
+	numAutorizacion VARCHAR(30),
+	idMIPRES VARCHAR(15),
+	fechaSuministroTecnologia VARCHAR(16),
+	tipoOS VARCHAR(2),
+	codTecnologiaSalud VARCHAR(20),
+	nomTecnologiaSalud VARCHAR(60),
+	cantidadOS INT, --VARCHAR(5),
+	tipoDocumentoIdentificacion VARCHAR(2),
+	numDocumentoIdentificacion VARCHAR(20),
+	vrUnitOS INT, -- VARCHAR(20),
+	vrServicio int, -- VARCHAR(20),
+	conceptoRecaudo VARCHAR(20),
+	tipoPagoModerador VARCHAR(2),
+	valorPagoModerador INT,
+	numFEVPagoModerador VARCHAR(20),
+	usuarioId  INT,
+   ID int,
    xconsecutivo int
 )
 DECLARE @DX TABLE (
@@ -579,16 +686,17 @@ BEGIN
             CASE WHEN ISNUMERIC(dbo.FNK_LIMPIATEXTO(LEFT(COALESCE(ICCN.DESCRIPCION,'0'),3),'0-9'))=1 THEN dbo.FNK_LIMPIATEXTO(LEFT(COALESCE(ICCN.DESCRIPCION,'0'),3),'0-9') ELSE 0 END,COALESCE(IUNI.HOMOLOGO_RIPS,247),COALESCE(IFFA.HOMOJSON,'null'),'11',
             COALESCE(HPRED.CANTIDAD,0),1,COALESCE(MED.TIPO_ID,'CC'),COALESCE(MED.IDMEDICO,DBO.FNK_VALORVARIABLE('EPI_MEDICODEFAULT')),CONVERT(VARCHAR,CONVERT(DECIMAL(14,2),HPRED.VALOR),20),
 			CONVERT(VARCHAR,CONVERT(DECIMAL(14,2),HPRED.VALOR*HPRED.CANTIDAD),20),IIF(COALESCE(HPRED.VALORCOPAGO,0)>0,'02',@conceptoRecaudo),'04',CONVERT(DECIMAL(14,2),HPRED.VALORCOPAGO),@N_FACTURA
-		FROM FTRDC INNER JOIN HADM ON FTRDC.NOADMISION=HADM.NOADMISION
-            INNER JOIN AFI  ON FTRDC.IDAFILIADO=AFI.IDAFILIADO
-            INNER JOIN HPRED ON FTRDC.NOPRESTACION=HPRED.NOPRESTACION AND FTRDC.NOITEM=HPRED.NOITEM 
-            INNER JOIN SER ON HPRED.IDSERVICIO=SER.IDSERVICIO AND FTRDC.IDSERVICIO = SER.IDSERVICIO
-			INNER JOIN RIPS_CP ON SER.CODIGORIPS=RIPS_CP.IDCONCEPTORIPS
-			LEFT JOIN IART ON COALESCE(HPRED.IDARTICULO,SER.IDARTICULO)=IART.IDARTICULO
-			LEFT JOIN IFFA ON IART.IDFORFARM=IFFA.IDFORFARM
-			LEFT JOIN IUNI ON IUNI.IDUNIDAD = IART.IDUNIDAD
-         LEFT JOIN ICCN ON IART.IDCONCENTRA=ICCN.IDCONCENTRA
-         LEFT JOIN MED ON COALESCE(HADM.IDMEDICOING,HADM.IDMEDICOTRA)=MED.IDMEDICO
+		FROM FTRDC  INNER JOIN HPRE ON FTRDC.NOADMISION=HPRE.NOADMISION AND HPRE.NOPRESTACION=FTRDC.NOPRESTACION
+                  INNER JOIN HPRED ON FTRDC.NOPRESTACION=HPRED.NOPRESTACION AND FTRDC.NOITEM=HPRED.NOITEM
+                  INNER JOIN HADM ON FTRDC.NOADMISION=HADM.NOADMISION
+                  INNER JOIN AFI  ON FTRDC.IDAFILIADO=AFI.IDAFILIADO
+                  INNER JOIN SER ON HPRED.IDSERVICIO=SER.IDSERVICIO AND FTRDC.IDSERVICIO = SER.IDSERVICIO
+                  INNER JOIN RIPS_CP ON SER.CODIGORIPS=RIPS_CP.IDCONCEPTORIPS
+                  LEFT JOIN IART ON COALESCE(HPRED.IDARTICULO,SER.IDARTICULO)=IART.IDARTICULO
+                  LEFT JOIN IFFA ON IART.IDFORFARM=IFFA.IDFORFARM
+                  LEFT JOIN IUNI ON IUNI.IDUNIDAD = IART.IDUNIDAD
+                  LEFT JOIN ICCN ON IART.IDCONCENTRA=ICCN.IDCONCENTRA
+                  LEFT JOIN MED ON COALESCE(HADM.IDMEDICOING,HADM.IDMEDICOTRA)=MED.IDMEDICO
 		WHERE FTRDC.CNSFTR=@CNSFCT
 		AND FTRDC.PROCEDENCIA='HADM'
 		AND HPRED.N_FACTURA=@N_FACTURA
@@ -924,7 +1032,7 @@ BEGIN
 			,@N_FACTURA                                                                       
 		FROM FTRDC 
 			INNER JOIN HADM ON FTRDC.NOADMISION=HADM.NOADMISION
-			INNER JOIN  HPRE ON HADM.NOADMISION=HPRE.NOADMISION
+			INNER JOIN  HPRE ON HADM.NOADMISION=HPRE.NOADMISION AND HPRE.NOPRESTACION=FTRDC.NOPRESTACION
 			INNER JOIN HPRED ON HPRE.NOPRESTACION=HPRED.NOPRESTACION AND HPRED.NOITEM = FTRDC.NOITEM
 			INNER JOIN SER ON HPRED.IDSERVICIO=SER.IDSERVICIO AND FTRDC.IDSERVICIO = SER.IDSERVICIO
 			INNER JOIN RIPS_CP ON SER.CODIGORIPS=RIPS_CP.IDCONCEPTORIPS
@@ -1078,103 +1186,54 @@ BEGIN
       DECLARE @IDAFILIADO VARCHAR(20)
       DECLARE @CNSX INT 
       DECLARE @ID INT 
-      --UPDATE @CONSULTAS SET conceptoRecaudo='05'
-      DECLARE PG_CURSOR CURSOR FOR 
-      SELECT ID,IDAFILIADO FROM @CONSULTAS
-      ORDER BY IDAFILIADO ASC
-      OPEN PG_CURSOR    
-      FETCH NEXT FROM PG_CURSOR    
-      INTO @ID, @IDAFILIADO
-      WHILE @@FETCH_STATUS = 0    
-      BEGIN 
-         IF @IDAFILIADOANT<>@IDAFILIADO
-         BEGIN
-            SELECT @CNSX=1,@IDAFILIADOANT=@IDAFILIADO
-         END
-         ELSE
-         BEGIN
-            SELECT @CNSX = @CNSX+1
-         END
-         UPDATE @CONSULTAS SET xconsecutivo=@CNSX WHERE ID=@ID
-         FETCH NEXT FROM PG_CURSOR    
-         INTO @ID, @IDAFILIADO
-      END
-      CLOSE PG_CURSOR
-      DEALLOCATE PG_CURSOR
+
+      INSERT INTO @CONSULTAS2 (codPrestador,	consecutivo,	IDAFILIADO,	fechaInicioAtencion,	numAutorizacion ,	codConsulta ,
+	                              modalidadGrupoServicioTecSal ,	grupoServicios ,	codServicio,	finalidadTecnologiaSalud ,	causaMotivoAtencion ,
+	                              codDiagnosticoPrincipal ,	codDiagnosticoRelacionado1,	codDiagnosticoRelacionado2,	codDiagnosticoRelacionado3,	tipoDiagnosticoPrincipal ,
+	                              vrServicio ,	tipoPagoModerador ,	tipoDocumentoIdentificacion ,	numDocumentoIdentificacion ,	conceptoRecaudo ,	valorPagoModerador ,	numFEVPagoModerador ,
+	                              usuarioId  ,   ID ,   xconsecutivo )
+      SELECT codPrestador,	consecutivo,	IDAFILIADO,	fechaInicioAtencion,	numAutorizacion ,	codConsulta ,
+	      modalidadGrupoServicioTecSal ,	grupoServicios ,	codServicio,	finalidadTecnologiaSalud ,	causaMotivoAtencion ,
+	      codDiagnosticoPrincipal ,	codDiagnosticoRelacionado1,	codDiagnosticoRelacionado2,	codDiagnosticoRelacionado3,	tipoDiagnosticoPrincipal ,
+	      vrServicio ,	tipoPagoModerador ,	tipoDocumentoIdentificacion ,	numDocumentoIdentificacion ,	conceptoRecaudo ,	valorPagoModerador ,	numFEVPagoModerador ,
+	      usuarioId  ,   ID , 
+         ROW_NUMBER() OVER(PARTITION BY IDAFILIADO ORDER BY IDAFILIADO ASC)
+     FROM @CONSULTAS
       --PROCEDIMIENTOS
-      SELECT @ID=0,@IDAFILIADOANT=''
-      DECLARE PG_CURSOR CURSOR FOR 
-      SELECT ID,IDAFILIADO FROM @PROCEDIMIENTOS
-      ORDER BY IDAFILIADO ASC
-      OPEN PG_CURSOR    
-      FETCH NEXT FROM PG_CURSOR    
-      INTO @ID, @IDAFILIADO
-      WHILE @@FETCH_STATUS = 0    
-      BEGIN 
-         IF @IDAFILIADOANT<>@IDAFILIADO
-         BEGIN
-            SELECT @CNSX=1,@IDAFILIADOANT=@IDAFILIADO
-         END
-         ELSE
-         BEGIN
-            SELECT @CNSX = @CNSX+1
-         END
-         UPDATE @PROCEDIMIENTOS SET xconsecutivo=@CNSX WHERE ID=@ID
-         FETCH NEXT FROM PG_CURSOR    
-         INTO @ID, @IDAFILIADO
-      END
-      CLOSE PG_CURSOR
-      DEALLOCATE PG_CURSOR
+
+      INSERT INTO @PROCEDIMIENTOS2(	codPrestador,	IDAFILIADO,	CONSECUTIVO,	fechaInicioAtencion,	idMIPRES,	numAutorizacion,	codProcedimiento,
+	viaIngresoServicioSalud,	modalidadGrupoServicioTecSal,	grupoServicios,	codServicio,	finalidadTecnologiaSalud ,	tipoDocumentoIdentificacion,
+	numDocumentoIdentificacion,	codDiagnosticoPrincipal,	codDiagnosticoRelacionado ,	codComplicacion,	vrServicio, 	conceptoRecaudo ,	tipoPagoModerador,
+	valorPagoModerador,	numFEVPagoModerador,	usuarioId,   ID ,   xconsecutivo)
+   SELECT codPrestador,	IDAFILIADO,	CONSECUTIVO,	fechaInicioAtencion,	idMIPRES,	numAutorizacion,	codProcedimiento,
+	viaIngresoServicioSalud,	modalidadGrupoServicioTecSal,	grupoServicios,	codServicio,	finalidadTecnologiaSalud ,	tipoDocumentoIdentificacion,
+	numDocumentoIdentificacion,	codDiagnosticoPrincipal,	codDiagnosticoRelacionado ,	codComplicacion,	vrServicio, 	conceptoRecaudo ,	tipoPagoModerador,
+	valorPagoModerador,	numFEVPagoModerador,	usuarioId,   ID ,   ROW_NUMBER() OVER(PARTITION BY IDAFILIADO ORDER BY IDAFILIADO ASC)
+   FROM @PROCEDIMIENTOS
 
     --MEDICAMENTOS
-      SELECT @ID=0,@IDAFILIADOANT=''
-      DECLARE PG_CURSOR CURSOR FOR 
-      SELECT ID,IDAFILIADO FROM @MEDICAMENTOS
-      ORDER BY IDAFILIADO ASC
-      OPEN PG_CURSOR    
-      FETCH NEXT FROM PG_CURSOR    
-      INTO @ID, @IDAFILIADO
-      WHILE @@FETCH_STATUS = 0    
-      BEGIN 
-         IF @IDAFILIADOANT<>@IDAFILIADO
-         BEGIN
-            SELECT @CNSX=1,@IDAFILIADOANT=@IDAFILIADO
-         END
-         ELSE
-         BEGIN
-            SELECT @CNSX = @CNSX+1
-         END
-         UPDATE @MEDICAMENTOS SET xconsecutivo=@CNSX WHERE ID=@ID
-         FETCH NEXT FROM PG_CURSOR    
-         INTO @ID, @IDAFILIADO
-      END
-      CLOSE PG_CURSOR
-      DEALLOCATE PG_CURSOR
+
+      INSERT INTO @MEDICAMENTOS2(codPrestador ,	IDAFILIADO ,	CONSECUTIVO,	idMIPRES ,	fechaDispensAdmon,	codDiagnosticoPrincipal ,	codDiagnosticoRelacionado,
+	               tipoMedicamento,	codTecnologiaSalud,	nomTecnologiaSalud,	concentracionMedicamento ,	unidadMedida ,	formaFarmaceutica,	unidadMinDispensa ,
+	               cantidadMedicamento,	diasTratamiento,	tipoDocumentoIdentificacion,	numDocumentoIdentificacion,	vrUnitMedicamento,	vrServicio,	conceptoRecaudo,
+	               tipoPagoModerador,	valorPagoModerador,	numFEVPagoModerador ,	usuarioId ,   ID  ,   xconsecutivo)
+      SELECT codPrestador ,	IDAFILIADO ,	CONSECUTIVO,	idMIPRES ,	fechaDispensAdmon,	codDiagnosticoPrincipal ,	codDiagnosticoRelacionado,
+	         tipoMedicamento,	codTecnologiaSalud,	nomTecnologiaSalud,	concentracionMedicamento ,	unidadMedida ,	formaFarmaceutica,	unidadMinDispensa ,
+	         cantidadMedicamento,	diasTratamiento,	tipoDocumentoIdentificacion,	numDocumentoIdentificacion,	vrUnitMedicamento,	vrServicio,	conceptoRecaudo,
+	         tipoPagoModerador,	valorPagoModerador,	numFEVPagoModerador ,	usuarioId ,   ID  ,    ROW_NUMBER() OVER(PARTITION BY IDAFILIADO ORDER BY IDAFILIADO ASC)
+      FROM @MEDICAMENTOS
 
     --OTROS SERVICIOS
-      SELECT @ID=0,@IDAFILIADOANT=''
-      DECLARE PG_CURSOR CURSOR FOR 
-      SELECT ID,IDAFILIADO FROM @OTROSSER
-      ORDER BY IDAFILIADO ASC
-      OPEN PG_CURSOR    
-      FETCH NEXT FROM PG_CURSOR    
-      INTO @ID, @IDAFILIADO
-      WHILE @@FETCH_STATUS = 0    
-      BEGIN 
-         IF @IDAFILIADOANT<>@IDAFILIADO
-         BEGIN
-            SELECT @CNSX=1,@IDAFILIADOANT=@IDAFILIADO
-         END
-         ELSE
-         BEGIN
-            SELECT @CNSX = @CNSX+1
-         END
-         UPDATE @OTROSSER SET xconsecutivo=@CNSX WHERE ID=@ID
-         FETCH NEXT FROM PG_CURSOR    
-         INTO @ID, @IDAFILIADO
-      END
-      CLOSE PG_CURSOR
-      DEALLOCATE PG_CURSOR
+
+     INSERT INTO @OTROSSER2(codPrestador,	IDAFILIADO ,	CONSECUTIVO,	numAutorizacion,	idMIPRES,	fechaSuministroTecnologia,	tipoOS,	
+               codTecnologiaSalud,nomTecnologiaSalud ,	cantidadOS,	tipoDocumentoIdentificacion,	numDocumentoIdentificacion,
+               vrUnitOS, 	vrServicio, 	conceptoRecaudo,	tipoPagoModerador, valorPagoModerador,	numFEVPagoModerador,	usuarioId ,
+               ID , xconsecutivo)
+      SELECT codPrestador,	IDAFILIADO ,	CONSECUTIVO,	numAutorizacion,	idMIPRES,	fechaSuministroTecnologia,	tipoOS,	
+            codTecnologiaSalud,nomTecnologiaSalud ,	cantidadOS,	tipoDocumentoIdentificacion,	numDocumentoIdentificacion,
+            vrUnitOS, 	vrServicio, 	conceptoRecaudo,	tipoPagoModerador, valorPagoModerador,	numFEVPagoModerador,	usuarioId ,
+            ID , ROW_NUMBER() OVER(PARTITION BY IDAFILIADO ORDER BY IDAFILIADO ASC)
+       FROM @OTROSSER
 
     --OTROS HOSPITALIZACION
       SELECT @ID=0,@IDAFILIADOANT=''
@@ -1250,10 +1309,11 @@ BEGIN
       END
       CLOSE PG_CURSOR
       DEALLOCATE PG_CURSOR
-     IF EXISTS(SELECT * FROM @PROCEDIMIENTOS WHERE tipoDocumentoIdentificacion IS NULL)
+
+     IF EXISTS(SELECT * FROM @PROCEDIMIENTOS2 WHERE tipoDocumentoIdentificacion IS NULL)
      BEGIN
-        UPDATE @PROCEDIMIENTOS SET tipoDocumentoIdentificacion=AFI.TIPO_DOC,numDocumentoIdentificacion=AFI.DOCIDAFILIADO
-        FROM @PROCEDIMIENTOS AP INNER JOIN AFI ON AP.IDAFILIADO=AFI.IDAFILIADO
+        UPDATE @PROCEDIMIENTOS2 SET tipoDocumentoIdentificacion=AFI.TIPO_DOC,numDocumentoIdentificacion=AFI.DOCIDAFILIADO
+        FROM @PROCEDIMIENTOS2 AP INNER JOIN AFI ON AP.IDAFILIADO=AFI.IDAFILIADO
         WHERE AP.tipoDocumentoIdentificacion IS NULL
      END
      DECLARE @MODE BIT
@@ -1264,20 +1324,20 @@ BEGIN
      INSERT INTO @MODERADORAS(NIVEL,VALOR)
      SELECT  ESCALASE,VALOR FROM MOCCD WHERE TIPODEPAGO='Moderadora'
 
-     UPDATE @CONSULTAS SET vrServicio=0,valorPagoModerador=CASE WHEN @CPROPIO=1 THEN 0 ELSE valorPagoModerador END,
+     UPDATE @CONSULTAS2 SET vrServicio=0,valorPagoModerador=CASE WHEN @CPROPIO=1 THEN 0 ELSE valorPagoModerador END,
                            conceptoRecaudo=CASE WHEN @CPROPIO=1 OR valorPagoModerador =0 THEN '05' ELSE CASE WHEN @MODE=0
                            THEN @conceptoRecaudo ELSE
                            CASE WHEN  valorPagoModerador IN (SELECT VALOR FROM @MODERADORAS) THEN '02' ELSE '01' END END  END
                            WHERE 1=1
-     UPDATE @PROCEDIMIENTOS SET vrServicio=0 ,valorPagoModerador=CASE WHEN @CPROPIO=1 THEN 0 ELSE valorPagoModerador END,
+     UPDATE @PROCEDIMIENTOS2 SET vrServicio=0 ,valorPagoModerador=CASE WHEN @CPROPIO=1 THEN 0 ELSE valorPagoModerador END,
                            conceptoRecaudo=CASE WHEN @CPROPIO=1 OR valorPagoModerador =0 THEN '05' ELSE CASE WHEN @MODE=0
                            THEN @conceptoRecaudo ELSE
                            CASE WHEN  valorPagoModerador IN (SELECT VALOR FROM @MODERADORAS) THEN '02' ELSE '01' END END END WHERE 1=1
-     UPDATE @MEDICAMENTOS SET vrServicio=0,vrUnitMedicamento=0,valorPagoModerador=CASE WHEN @CPROPIO=1 THEN 0 ELSE valorPagoModerador END,
+     UPDATE @MEDICAMENTOS2 SET vrServicio=0,vrUnitMedicamento=0,valorPagoModerador=CASE WHEN @CPROPIO=1 THEN 0 ELSE valorPagoModerador END,
                            conceptoRecaudo=CASE WHEN @CPROPIO=1 OR valorPagoModerador =0 THEN '05' ELSE CASE WHEN @MODE=0
                            THEN @conceptoRecaudo ELSE
                            CASE WHEN  valorPagoModerador IN (SELECT VALOR FROM @MODERADORAS) THEN '02' ELSE '01' END END END WHERE 1=1
-     UPDATE @OTROSSER SET vrServicio=0,vrUnitOS=0,valorPagoModerador=CASE WHEN @CPROPIO=1 THEN 0 ELSE valorPagoModerador END,
+     UPDATE @OTROSSER2 SET vrServicio=0,vrUnitOS=0,valorPagoModerador=CASE WHEN @CPROPIO=1 THEN 0 ELSE valorPagoModerador END,
                            conceptoRecaudo=CASE WHEN @CPROPIO=1 OR valorPagoModerador =0 THEN '05' ELSE CASE WHEN @MODE=0
                            THEN @conceptoRecaudo ELSE
                            CASE WHEN  valorPagoModerador IN (SELECT VALOR FROM @MODERADORAS) THEN '02' ELSE '01' END END END  WHERE 1=1
@@ -1288,9 +1348,9 @@ BEGIN
      --SELECT 'AT',conceptoRecaudo,SUM(valorPagoModerador) FROM @OTROSSER  GROUP BY conceptoRecaudo
 
 
-     IF EXISTS(SELECT * FROM @CONSULTAS WHERE codDiagnosticoPrincipal IS NULL)
+     IF EXISTS(SELECT * FROM @CONSULTAS2 WHERE codDiagnosticoPrincipal IS NULL)
      BEGIN
-        UPDATE @CONSULTAS SET codDiagnosticoPrincipal='Z000',tipoDiagnosticoPrincipal='01' WHERE codDiagnosticoPrincipal IS NULL
+        UPDATE @CONSULTAS2 SET codDiagnosticoPrincipal='Z000',tipoDiagnosticoPrincipal='01' WHERE codDiagnosticoPrincipal IS NULL
      END
      --SELECT 'AC', COUNT(*) FROM @CONSULTAS
      --SELECT 'AP', COUNT(*) FROM @PROCEDIMIENTOS
@@ -1349,7 +1409,7 @@ BEGIN
 										c.valorPagoModerador,
 										c.numFEVPagoModerador,
 										consecutivo =xconsecutivo                              
-									FROM @CONSULTAS c
+									FROM @CONSULTAS2 c
 									WHERE c.usuarioId = u.usuarioId
 									FOR JSON PATH
 								),
@@ -1375,7 +1435,7 @@ BEGIN
 										p.valorPagoModerador,
 										p.numFEVPagoModerador,
 										consecutivo = xconsecutivo    
-									FROM @PROCEDIMIENTOS p
+									FROM @PROCEDIMIENTOS2 p
 									WHERE p.usuarioId = u.usuarioId
 									FOR JSON PATH
 								),
@@ -1465,7 +1525,7 @@ BEGIN
 										m.valorPagoModerador,
 										m.numFEVPagoModerador,
 										consecutivo = xconsecutivo    
-									FROM @MEDICAMENTOS m
+									FROM @MEDICAMENTOS2 m
 									WHERE m.usuarioId = u.usuarioId
 									FOR JSON PATH
 								),
@@ -1487,7 +1547,7 @@ BEGIN
 										os.valorPagoModerador,
 										os.numFEVPagoModerador,
 										consecutivo = xconsecutivo    
-									FROM @OTROSSER os
+									FROM @OTROSSER2 os
 									WHERE os.usuarioId = u.usuarioId                        
 									FOR JSON PATH
 								)
