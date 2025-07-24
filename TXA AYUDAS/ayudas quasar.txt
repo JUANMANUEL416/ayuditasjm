@@ -23,9 +23,14 @@ formularios
         </q-form>
       </q-card>
     </q-dialog> 
-                      no-caps
-                      outline
-                      glossy
+--input con busqueda
+                  <div class="col-4 q-ml-md">
+                      <q-input standout bottom-slots v-model="KCUENTA.CUEESPEJO" label="Cuenta Espejo" outlined dense>
+                        <template v-slot:append>
+                          <q-icon name="search" @click="BuscaCuenta('1')" />
+                        </template>
+                      </q-input>
+                  </div>
 Buscadores
  <q-dialog v-model="XXX">
       <q-card style="width: 700px; max-width: 80vw" class="q-pa-none">
@@ -318,3 +323,23 @@ END
       },
     },		  
 	
+-- mensage confirmaGenNotas
+$q.dialog({
+    title: "Confirmación",
+    message: `Confirma que desea generar N° de Autorizacion?`,
+    persistent: true,
+    html: true,
+    dark: false,
+    class: "text-primary",
+    cancel: {
+      label: "Cancelar",
+      push: true,
+      color: "red-6",
+    },
+    ok: {
+      label: "Confirmar",
+      push: true,
+      color: "green-9",
+    },
+  }).onOk(() => {
+-- 

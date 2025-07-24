@@ -1,0 +1,30 @@
+SELECT TOP 10 * FROM API_LOG WHERE USUARIO='JJIMENEZ' ORDER BY ITEM DESC
+
+BEGIN TRAN
+EXEC SPQ_JSON '{"MODELO":"APAG_COL","METODO":"CIERRA_APAG","PARAMETROS":{"DATOS":{"IDPAGARE":"0600000006"}},"USUARIO":"JJIMENEZ"}'
+
+'Declaro PRIMERO que me obligo a pagar solidariamente e incondicionalmente a la orden deCOMITE DE ESTUDIOS MEDICOS S.A.S                                    de la Salud, entidad sin animo de lucro, identificada con NIT 900294794-5 o a quien represente sus derechos                                    la suma de CIENTO CINCUENTA MIL PESOS M/CTE.($  150000.00)                                    mas los intereses durante el plazo. SEGUNDA  En caso de mora y mientras ella subsista, pagaremos intereses  moratorios a la tasa del                                   máxima legal autorizada según  las normas comerciales. TERCERA:  De igual manera por medio del presente documento autorizamos de                                    manera especial, expresa e irrevocable al acreedor, para que contrate  la gestión de cobranza que se haga necesaria en el evento de                                    mora en el cumplimiento de  mi obligación y por lo mismo, me obligo a pagar todos los gastos y costos que se genere ya sea de la                                    cobranza judicial o extrajudicial, incluyendo los honorarios de abogados. CUARTA: Clausula aclaratoria: El acreedor podrá declarar                                    vencido el plazo y exigir inmediatamente el pago de  la totalidad de la obligación cuando el deudor  entre en mora o incumpla                                    cualquiera de las obligaciones derivadas de este documento.'
+ROLLBACK
+<i class="fa-solid fa-print"></i>
+SELECT * FROM DBO.FNK_CREA_TABLA_DESDEJSON ('{"PROCESO":"Nuevo","FECHA":"18/05/2024","VALOR_NUM":120000,"IDTERCERO":"010000003498","NIT":"1032190568","RAZONSOCIAL":"RUEDA MARIN DIEGO ALEJANDRO","F_VENCE":"2024-05-18","AUTORIZADOR":"1000407692","NOMBREAUT":"JUAN FELIPE ARBELAEZ TRUJILLO","NOADMISION":"0100000012","OBSERVACION":"PRUEBAS DE SOPORTE"}')
+
+SELECT ESTADO,* FROM APAG WHERE IDPAGARE='0600000006'
+
+SELECT  IDPAGARE,APAG.IDTERCERO,TER.NIT,TER.RAZONSOCIAL,DBO.FNK_FECHA_GRINGA(APAG.FECHA)FECHA,VALOR_NUM,DBO.FNK_FECHA_GRINGA(APAG.FECHAVENCE)F_VENCE,                          APAG.ESTADO,COALESCE(APAG.CODCAJA,'')CODCAJA,COALESCE(APAG.CNSFACJ,'')CNSFACJ,APAG.AUTORIZDOR,USUSU.NOMBRE,DESCRIPCION,NOADMISION                          FROM [dbo].[APAG] INNER JOIN  TER ON APAG.IDTERCERO=TER.IDTERCERO INNER JOIN USUSU ON APAG.AUTORIZDOR=USUSU.USUARIO  WHERE ([dbo].[APAG].[IDPAGARE] LIKE '%%%%' OR [dbo].[APAG].[IDTERCERO] LIKE '%%%%' OR [dbo].[APAG].[FECHA] LIKE '%%%%' OR [dbo].[APAG].[VALOR_NUM] LIKE '%%%%' OR [dbo].[APAG].[FECHAVENCE] LIKE '%%%%' OR [dbo].[APAG].[FECHAVENCE_FATE] LIKE '%%%%' OR [dbo].[APAG].[FORMA_PAGO] LIKE '%%%%' OR [dbo].[APAG].[CONFIRMACION] LIKE '%%%%' OR [dbo].[APAG].[DESCRIPCION] LIKE '%%%%' OR [dbo].[APAG].[NOADMISION] LIKE '%%%%' OR [dbo].[APAG].[USUARIO] LIKE '%%%%' OR [dbo].[APAG].[SYS_COMPUTERNAME] LIKE '%%%%' OR [dbo].[APAG].[AUTORIZDOR] LIKE '%%%%' OR [dbo].[APAG].[ESTADO] LIKE '%%%%' OR [dbo].[APAG].[CODCAJA] LIKE '%%%%' OR [dbo].[APAG].[CNSFACJ] LIKE '%%%%') AND APAG.NOADMISION='0100000012'  ORDER BY APAG.IDPAGARE OFFSET (1-1)*12 ROWS  FETCH NEXT 12 ROWS ONLY 
+
+SELECT DISTINCT ESTADO FROM APAG
+
+            SELECT IDSEDE= COALESCE(UBEQ.IDSEDE,USUSU.IDSEDE),COMPANIA=UBEQ.COMPANIA,
+            SYS_COMPUTERNAME=COALESCE(USUSU.SYS_COMPUTERNAME,HOST_NAME())
+            FROM USUSU LEFT JOIN UBEQ ON USUSU.SYS_ComputerName=UBEQ.SYS_ComputerName
+            WHERE USUARIO='JJIMENEZ'
+
+SELECT  IDPAGARE,APAG.IDTERCERO,TER.NIT,TER.RAZONSOCIAL,DBO.FNK_FECHA_GRINGA(APAG.FECHA)FECHA,VALOR_NUM,DBO.FNK_FECHA_GRINGA(APAG.FECHAVENCE)F_VENCE, 
+PAG.ESTADO,COALESCE(APAG.CODCAJA,'')CODCAJA,COALESCE(APAG.CNSFACJ,'')CNSFACJ,APAG.AUTORIZDOR,USUSU.NOMBRE                          FROM [dbo].[APAG] INNER JOIN  TER ON APAG.IDTERCERO=TER.IDTERCERO INNER JOIN USUSU ON APAG.AUTORIZDOR=USUSU.USUARIO  WHERE ([dbo].[APAG].[IDPAGARE] LIKE '%%%%' OR [dbo].[APAG].[IDTERCERO] LIKE '%%%%' OR [dbo].[APAG].[FECHA] LIKE '%%%%' OR [dbo].[APAG].[VALOR_NUM] LIKE '%%%%' OR [dbo].[APAG].[FECHAVENCE] LIKE '%%%%' OR [dbo].[APAG].[FECHAVENCE_FATE] LIKE '%%%%' OR [dbo].[APAG].[FORMA_PAGO] LIKE '%%%%' OR [dbo].[APAG].[CONFIRMACION] LIKE '%%%%' OR [dbo].[APAG].[DESCRIPCION] LIKE '%%%%' OR [dbo].[APAG].[NOADMISION] LIKE '%%%%' OR [dbo].[APAG].[USUARIO] LIKE '%%%%' OR [dbo].[APAG].[SYS_COMPUTERNAME] LIKE '%%%%' OR [dbo].[APAG].[AUTORIZDOR] LIKE '%%%%' OR [dbo].[APAG].[ESTADO] LIKE '%%%%' OR [dbo].[APAG].[CODCAJA] LIKE '%%%%' OR [dbo].[APAG].[CNSFACJ] LIKE '%%%%') AND APAG.NOADMISION='0100000012'  ORDER BY APAG.IDPAGARE OFFSET (1-1)*12 ROWS  FETCH NEXT 12 ROWS ONLY 
+
+
+'Declaro PRIMERO que me obligo a pagar solidariamente e incondicionalmente a la orden deCOMITE DE ESTUDIOS MEDICOS S.A.Sde la Salud, entidad sin animo de lucro, identificada con NIT 900294794-5 o a quien represente sus derechosla suma de CIENTO CINCUENTA MIL PESOS M/CTE.($  150000.00)mas los intereses durante el plazo. SEGUNDA  En caso de mora y mientras ella subsista, pagaremos intereses  moratorios a la tasa delmáxima legal autorizada según  las normas comerciales. TERCERA:  De igual manera por medio del presente documento autorizamos demanera especial, expresa e irrevocable al acreedor, para que contrate  la gestión de cobranza que se haga necesaria en el evento demora en el cumplimiento de  mi obligación y por lo mismo, me obligo a pagar todos los gastos y costos que se genere ya sea de lacobranza judicial o extrajudicial, incluyendo los honorarios de abogados. CUARTA: Clausula aclaratoria: El acreedor podrá declararvencido el plazo y exigir inmediatamente el pago de  la totalidad de la obligación cuando el deudor  entre en mora o incumplacualquiera de las obligaciones derivadas de este documento.'
+
+SELECT REPLACE('                                 ',SPACE(1),0)
+
+SELECT LEN('000000000000000000000000000000000')

@@ -1,0 +1,6 @@
+
+SELECT  * FROM FDIANR WHERE CNSDOCUMENTO='0200020423'
+
+<cbc:ID schemeID="01">COPAGO</cbc:ID>
+
+UPDATE FDIANR SET XML_AttachedDocument=REPLACE(XML_AttachedDocument,'<cbc:ID schemeID="01">COPAGO</cbc:ID>','<cbc:ID schemeID="04">ANTICIPO</cbc:ID>') WHERE ITEM=35095

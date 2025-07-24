@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-16"?>
+<AutoReplacement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Token>XFINAL</Token>
+  <Name>FINAL</Name>
+  <CaseSensitive>false</CaseSensitive>
+  <SelectReplacement>false</SelectReplacement>
+  <Replacement>IF(SELECT COUNT(*) FROM @TBLERRORES)&gt;0
+BEGIN
+       SELECT 'KO' OK, ERROR FROM @TBLERRORES
+       RETURN
+END
+SELECT 'OK' OK
+RETURN </Replacement>
+  <CursorPositionMarker>#</CursorPositionMarker>
+</AutoReplacement>

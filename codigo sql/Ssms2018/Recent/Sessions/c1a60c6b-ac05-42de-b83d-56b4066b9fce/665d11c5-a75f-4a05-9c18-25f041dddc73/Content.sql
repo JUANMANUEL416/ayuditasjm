@@ -1,0 +1,1 @@
+select * from dbo.fnk_fas_indicadores('20240701','20240731')

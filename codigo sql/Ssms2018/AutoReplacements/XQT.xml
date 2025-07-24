@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-16"?>
+<AutoReplacement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Token>XQT</Token>
+  <Name>CAMPO QASAR T</Name>
+  <CaseSensitive>false</CaseSensitive>
+  <SelectReplacement>false</SelectReplacement>
+  <Replacement>    {
+      name: "{PASTE}",
+      required: true,
+      label: "{PASTE}",
+      align: "left",
+      field: (row) =&gt; row.{PASTE},
+      format: (val) =&gt; `${val}`,
+      sortable: false,
+    },</Replacement>
+  <CursorPositionMarker>#</CursorPositionMarker>
+</AutoReplacement>
