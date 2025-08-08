@@ -17,4 +17,4 @@ WHERE
 ORDER BY 
     t.transaction_begin_time;
 
-    KILL 165;
+ --   KILL 165;
